@@ -1,0 +1,5 @@
+{
+    "BASE_URL": "https://localhost.com",
+    "PORT": "5000",
+    "TEST_PARAM": "val123"
+}
