@@ -14,10 +14,9 @@ class RequestCommand(Command):
         self.menu = menu
         self.environment_path = environment_path
 
-    # TODO will make the http request via httpie
     def execute(self):
-        request = RequestBuilder(self.request_path, self.environment_path)
-        # pass to request handler
+        request = RequestBuilder(self.request_path, self.environment_path).build()
+        print(request)
 
     def __repr__(self):
         return self.request_path.rpartition("/")[2]

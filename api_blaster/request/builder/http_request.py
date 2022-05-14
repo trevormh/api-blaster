@@ -1,3 +1,4 @@
+import json
 
 
 class HttpRequest:
@@ -9,3 +10,9 @@ class HttpRequest:
 
     def execute(self):
         pass
+
+    def __repr__(self):
+        attrs = {}
+        for attribute, value in self.__dict__.items():
+            attrs[attribute] = value
+        return json.dumps(attrs)
