@@ -1,8 +1,7 @@
-import sys
-import re
+import sys, os, re
 
 from api_blaster.request.builder.abstract_builder import AbstractBuilder
-from api_blaster.request.builder.http_request import HttpRequest
+from api_blaster.request.http_request import HttpRequest
 import json
 
 
@@ -10,11 +9,24 @@ class RequestBuilder(AbstractBuilder):
     env_regex = "{{(.*?)}}(?!})"
     default_method = 'GET'
 
-    def __init__(self, request_file_path: str, env_path: str):
+    def __init__(self, request_file_path: str):
         self.path = request_file_path
         self.request_config = self.load_json_config(request_file_path)
-        self.env_config = self.load_json_config(env_path)
+        self._load_env_configs()
         self.request = HttpRequest()
+
+    def _load_env_configs(self):
+        """
+        Load any environment variables and credentials into the environment_config instance property
+        """
+        self.environment_config = {}
+        dir = self.path.rpartition("/")[0]
+        if os.path.isfile(f"{dir}/environment.json"):
+            env_path = f"{dir}/environment.json"
+            self.environment_config = self.load_json_config(env_path)
+        if os.path.isfile(f"{dir}/credentials.json"):
+            env_path = f"{dir}/credentials.json"
+            self.environment_config.update(self.load_json_config(env_path))
 
     def load_json_config(self, path: str):
         try:
@@ -27,14 +39,13 @@ class RequestBuilder(AbstractBuilder):
 
     def build(self) -> HttpRequest:
         self.set_url()
-        self.set_method()
         self.set_name()
         self.set_headers()
         return self.request
 
     def apply_env_vars(self, item: str, env_vars: list[str]) -> str:
         for env in env_vars:
-            item = item.replace("{{" + env + "}}", self.env_config[env])
+            item = item.replace("{{" + env + "}}", self.environment_config[env])
         return item
 
     def find_env_var(self, s: str) -> list:
@@ -47,20 +58,17 @@ class RequestBuilder(AbstractBuilder):
             url = self.apply_env_vars(url, env_vars)
         self.request.url = url
 
-    def set_method(self):
-        if 'method' in self.request_config:
-            self.request.method = self.request_config['method']
-        else:
-            self.request.method = self.default_method
-
     def set_headers(self):
         if 'headers' in self.request_config:
             self.request.headers = {}
-            for header in self.request_config['headers']:
-                env_vars = self.find_env_var(header)
+            for header, val in self.request_config['headers'].items():
+                env_vars = self.find_env_var(val)
                 if env_vars:
-                    header = self.apply_env_vars(header, env_vars)
-                self.request.headers[header] = header
+                    val = self.apply_env_vars(val, env_vars)
+                self.request.headers[header] = val
+        # if no method is set use GET by default
+        if "method" not in self.request.headers:
+            self.request.headers["method"] = "GET"
 
     def set_name(self):
         filename = self.path.rpartition("/")[2]

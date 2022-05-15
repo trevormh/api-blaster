@@ -9,7 +9,7 @@ from api_blaster.cli.commands.directory_command import DirectoryCommand
 from api_blaster.cli.commands.request_command import RequestCommand
 
 
-class MenuBuilder():
+class MenuBuilder:
     reserved_names = ['environment.json']
 
     def __init__(self, current_dir):
@@ -17,6 +17,7 @@ class MenuBuilder():
         self.items = []
         self.environment_path = None
         self._set_environment_path()
+
         self._set_items()
 
     def _set_items(self):
@@ -50,7 +51,7 @@ class MenuBuilder():
                 menu_items.append(DirectoryCommand(self, item_path))
             elif os.path.isfile(item_path):
                 if item not in self.reserved_names:
-                    menu_items.append(RequestCommand(self, item_path, self.environment_path))
+                    menu_items.append(RequestCommand(self, item_path))
         return menu_items
 
     def update(self):

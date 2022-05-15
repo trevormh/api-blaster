@@ -12,10 +12,9 @@ class AbstractBuilder:
         pass
 
     @abstractmethod
-    def set_name(self):
+    def set_headers(self):
         pass
 
-    # @abstractmethod
-    # def execute(self):
-    #     pass
-
+    @abstractmethod
+    def set_name(self):
+        pass
