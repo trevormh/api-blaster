@@ -7,10 +7,6 @@ if TYPE_CHECKING:
 
 class Formatter:
 
-    # TODO implement chain of command to responsibility to make sure each item in sequence of httpie commands are in order
-    # https://refactoring.guru/design-patterns/chain-of-responsibility
-    # https://refactoring.guru/design-patterns/chain-of-responsibility/python/example
-    # https://httpie.io/docs/cli/examples
     def __init__(self, request: 'HttpRequest'):
         self.request = request
         self.handlers = self._set_handlers()
@@ -21,8 +17,12 @@ class Formatter:
         form = handlers.FormHandler()
         method = handlers.MethodHandler()
         url = handlers.URLHandler()
-        protocol.set_next(auth).set_next(form).set_next(method).set_next(url)
+        protocol\
+            .set_next(auth)\
+            .set_next(form)\
+            .set_next(method)\
+            .set_next(url)
         return protocol
 
-    def format(self) -> str:
-        return self.handlers.next(self.request, '')
+    def format(self) -> list[str]:
+        return self.handlers.next(self.request, [])

@@ -4,17 +4,17 @@ from typing import Any
 
 class ProtocolHandler(Handler):
     def next(self, request: Any, request_str: str) -> Any:
-        request_str = "https"
+        request_str = "http"
         return super().next(request, request_str)
 
 
 class AuthHandler(Handler):
     def next(self, request: Any, request_str: str) -> Any:
         if "Authorization" in request.headers:
-            request_str += self._get_auth_str(request)
-            return super().next(request, request_str)
+            request_str += self._auth_str(request)
+        return super().next(request, request_str)
 
-    def _get_auth_str(self, request: Any) -> str:
+    def _auth_str(self, request: Any) -> str:
         auth = request.headers['Authorization'].rpartition(" ")
         type = auth[0]
         creds = auth[2]

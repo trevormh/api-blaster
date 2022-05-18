@@ -1,6 +1,7 @@
 from api_blaster.cli.commands.command import Command
 from api_blaster.request.formatter.formatter import Formatter
 import json
+from httpie.core import main as httpie_main
 
 
 class HttpRequest(Command):
@@ -16,5 +17,5 @@ class HttpRequest(Command):
         return json.dumps(attrs)
 
     def execute(self):
-        fmt = Formatter(self).format()
-        print(fmt)
+        cmd = Formatter(self).format()
+        httpie_main(cmd.split())
