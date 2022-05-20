@@ -1,47 +1,46 @@
 from api_blaster.request.formatter.handler import Handler
-from typing import Any
+from typing import Any, List, Callable, Union
 
 
 class ProtocolHandler(Handler):
-    def next(self, request: Any, request_str: str) -> Any:
-        request_str = "http"
-        return super().next(request, request_str)
+    def next(self, request: Any, req_list: List[str]) -> list[str]:
+        req_list.append("http")
+        return super().next(request, req_list)
 
 
 class AuthHandler(Handler):
-    def next(self, request: Any, request_str: str) -> Any:
+    def next(self, request: Any, req_list: List[str]) -> list[str]:
         if "Authorization" in request.headers:
-            request_str += self._auth_str(request)
-        return super().next(request, request_str)
+            auth = self._auth_str(request)
+            if auth:
+                req_list.extend(auth)
+        return super().next(request, req_list)
 
-    def _auth_str(self, request: Any) -> str:
+    def _auth_str(self, request: Any) -> Union[List[str], None]:
         auth = request.headers['Authorization'].rpartition(" ")
         type = auth[0]
         creds = auth[2]
         if type.lower() == "basic":
-            return f" -a {creds}"
+            return ["-a", creds]
         elif type.lower() == "bearer":
-            return f" -A bearer -a {creds}"
+            return ["-A", "bearer", "-a", creds]
+        else:
+            return None
 
 
 class MethodHandler(Handler):
-    def next(self, request: Any, request_str: str) -> Any:
-        request_str += self._method_str(request)
-        return super().next(request, request_str)
-
-    def _method_str(self, request: Any) -> str:
-        return f" {request.headers['method']}"
+    def next(self, request: Any, req_list: List[str]) -> list[str]:
+        # breakpoint()
+        req_list.append(request.headers['method'])
+        return super().next(request, req_list)
 
 
 class URLHandler(Handler):
-    def next(self, request: Any, request_str: str) -> Any:
-        request_str += self._url_str(request)
-        return super().next(request, request_str)
-
-    def _url_str(self, request: Any) -> str:
-        return f" {request.url}"
+    def next(self, request: Any, req_list: List[str]) -> list[str]:
+        req_list.append(request.url)
+        return super().next(request, req_list)
 
 
 class FormHandler(Handler):
-    def next(self, request: Any, request_str: str) -> Any:
-        return super().next(request, request_str)
+    def next(self, request: Any, req_list: List[str]) -> list[str]:
+        return super().next(request, req_list)
