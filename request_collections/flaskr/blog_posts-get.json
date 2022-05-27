@@ -1,0 +1,9 @@
+{
+    "name": "Blog Posts - GET",
+    "url": "{{BASE_URL}}:{{PORT}}/api/blog/",
+    "headers": {
+        "method": "GET",
+        "content-type": "application/json",
+        "Authorization": "Bearer {{FLASKR_BEARER}}"
+    }
+}

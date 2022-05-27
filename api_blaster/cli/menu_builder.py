@@ -10,19 +10,19 @@ from api_blaster.cli.commands.request_command import RequestCommand
 
 
 class MenuBuilder:
-    reserved_names = ['environment.json']
+    reserved_names = ['.env']
 
-    def __init__(self, current_dir):
-        self.dir = current_dir
+    def __init__(self, collections_dir):
+        self.dir = collections_dir
         self.items = []
-        self.environment_path = None
-        self._set_environment_path()
+        self.dot_env_path = None
+        self._set_dot_env_path()
 
         self._set_items()
 
     def _set_items(self):
         items = self._read_contents()
-        self._set_environment_path()
+        self._set_dot_env_path()
         self.items = self._create_menu_commands(items)
 
     def get_items(self):
@@ -36,9 +36,9 @@ class MenuBuilder:
     def cur_directory(self):
         return self.dir.rpartition("/")[2]
 
-    def _set_environment_path(self):
-        if os.path.isfile(f"{self.dir}/environment.json"):
-            self.environment_path = f"{self.dir}/environment.json"
+    def _set_dot_env_path(self):
+        if os.path.isfile(f"{self.dir}/.env"):
+            self.dot_env_path = f"{self.dir}/.env"
 
     def _read_contents(self) -> List[str]:
         return os.listdir(self.dir)
@@ -51,7 +51,7 @@ class MenuBuilder:
                 menu_items.append(DirectoryCommand(self, item_path))
             elif os.path.isfile(item_path):
                 if item not in self.reserved_names:
-                    menu_items.append(RequestCommand(self, item_path))
+                    menu_items.append(RequestCommand(self, self.dir, item))
         return menu_items
 
     def update(self):

@@ -3,30 +3,27 @@ import sys, os, re
 from api_blaster.request.builder.abstract_builder import AbstractBuilder
 from api_blaster.request.http_request import HttpRequest
 import json
+from dotenv import load_dotenv
 
 
 class RequestBuilder(AbstractBuilder):
+
     env_regex = "{{(.*?)}}(?!})"
     default_method = 'GET'
 
-    def __init__(self, request_file_path: str):
-        self.path = request_file_path
-        self.request_config = self.load_json_config(request_file_path)
-        self._load_env_configs()
+    def __init__(self, directory: str, filename: str):
+        self.path = directory
+        self.filename = filename
+        self.request_config = self.load_json_config(f"{directory}/{filename}")
         self.request = HttpRequest()
+        self._set_env_path()
 
-    def _load_env_configs(self):
-        """
-        Load any environment variables and credentials into the environment_config instance property
-        """
-        self.environment_config = {}
-        dir = self.path.rpartition("/")[0]
-        if os.path.isfile(f"{dir}/environment.json"):
-            env_path = f"{dir}/environment.json"
-            self.environment_config = self.load_json_config(env_path)
-        if os.path.isfile(f"{dir}/credentials.json"):
-            env_path = f"{dir}/credentials.json"
-            self.environment_config.update(self.load_json_config(env_path))
+    def _set_env_path(self):
+        if os.path.isfile(f"{self.path}/.env"):
+            load_dotenv(f"{self.path}/.env")
+            self.env_loaded = True
+        else:
+            self.env_loaded = False
 
     def load_json_config(self, path: str):
         try:
@@ -45,7 +42,16 @@ class RequestBuilder(AbstractBuilder):
 
     def apply_env_vars(self, item: str, env_vars: list[str]) -> str:
         for env in env_vars:
-            item = item.replace("{{" + env + "}}", self.environment_config[env])
+            try:
+                item = item.replace("{{" + env + "}}", os.getenv(env))
+            except Exception as e:
+                # TODO implement better warning handling
+                import warnings
+                warning = '\33[33m'
+                end = '\033[0m'
+                warnings.warn(
+                    f"{warning}.env file missing variable {env} used by request{end}",
+                    RuntimeWarning, stacklevel=2, source=None)
         return item
 
     def find_env_var(self, s: str) -> list:
@@ -54,8 +60,14 @@ class RequestBuilder(AbstractBuilder):
     def set_url(self):
         url = self.request_config['url']
         env_vars = self.find_env_var(url)
-        if env_vars:
+        if env_vars and self.env_loaded:
             url = self.apply_env_vars(url, env_vars)
+        elif env_vars and not self.env_loaded:
+            # TODO implement better warning handling
+            import warnings
+            warning = '\33[33m'
+            end = '\033[0m'
+            warnings.warn(f"{warning}Request contains env variables, but no .env file was found in the following directory at the following path: {self.path}{end}", RuntimeWarning, stacklevel=2, source=None)
         self.request.url = url
 
     def set_headers(self):
@@ -71,5 +83,5 @@ class RequestBuilder(AbstractBuilder):
             self.request.headers["method"] = "GET"
 
     def set_name(self):
-        filename = self.path.rpartition("/")[2]
+        filename = self.filename
         self.request.name = filename.replace(".json", "")

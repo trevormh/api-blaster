@@ -9,13 +9,14 @@ if TYPE_CHECKING:
 
 class RequestCommand(Command):
 
-    def __init__(self, menu: 'MenuBuilder', request_path):
-        self.request_path = request_path
+    def __init__(self, menu: 'MenuBuilder', directory: str, filename: str):
+        self.directory = directory
+        self.filename = filename
         self.menu = menu
 
     def execute(self):
-        request = RequestBuilder(self.request_path).build()
+        request = RequestBuilder(self.directory, self.filename).build()
         request.execute()
 
     def __repr__(self):
-        return self.request_path.rpartition("/")[2]
+        return self.filename

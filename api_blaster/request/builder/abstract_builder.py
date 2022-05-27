@@ -8,10 +8,6 @@ class AbstractBuilder:
         pass
 
     @abstractmethod
-    def set_method(self):
-        pass
-
-    @abstractmethod
     def set_headers(self):
         pass
 
