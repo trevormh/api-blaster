@@ -4,7 +4,7 @@ from prompt_toolkit.completion import WordCompleter
 
 from api_blaster.__main__ import ROOT_DIR
 from api_blaster.cli.menu_builder import MenuBuilder
-
+from api_blaster.cli.helpers import info, style_menu_items
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -21,18 +21,22 @@ class CLI:
         self.items = []
         self.cmd = cmd.Cmd()
 
-    def get_commands(self) -> List['Command']:
+    def get_commands(self):
         return self.menu.get_items()
 
-    def menu_items(self) -> List[str]:
+    def menu_items(self):
         menu_items = []
+        commands = []
         for item in self.get_commands():
             menu_items.append(repr(item))
-        return menu_items
+            commands.append(item)
+        return [commands, menu_items]
 
     def print_menu(self, items):
-        print(f"Directory: {self.menu.cur_directory()}")
-        self.cmd.columnize(items, displaywidth=50)
+        info(f"Directory: {self.menu.cur_directory()}")
+        styled = style_menu_items(items)
+        # breakpoint()
+        self.cmd.columnize(styled, displaywidth=80)
 
     def handle_nav(self, cmd: str):
         if cmd == 'cd ..':
@@ -46,7 +50,8 @@ class CLI:
         elif cmd in self.nav_cmds:
             return self.handle_nav(cmd)
         try:
-            idx = self.menu_items().index(cmd)
+            _, commands = self.menu_items()
+            idx = commands.index(cmd)
             self.get_commands()[idx].execute()
         except ValueError:
             print(f"Item '{cmd}' not found", end="\n\n")
@@ -58,12 +63,18 @@ def main():
     cli = CLI(menu)
     while True:
         try:
-            items = cli.menu_items()
-            cli.print_menu(items)
+            commands, items = cli.menu_items()
+            cli.print_menu(commands)
             items.extend(cli.nav_cmds)
-            selection = prompt('%s> ', completer=WordCompleter(items))
+            selection = prompt('> ', completer=WordCompleter(items))
             cli.execute(selection)
-        except KeyboardInterrupt:
-            break  # Control-C pressed
-        except EOFError:
-            break  # Control-D pressed
+        except (FileNotFoundError, NameError, IOError) as err:
+            from api_blaster.cli.helpers import critical
+            critical(f"Failed to execute request.\n{err.args[0]}")
+            break
+        except (KeyboardInterrupt, EOFError):
+            break  # Control-C or Control-D pressed
+        except Exception as err:
+            from api_blaster.cli.helpers import critical
+            critical(f"Failed to execute request.\n{err.args[0]}")
+            break

@@ -1,4 +1,4 @@
-import os
+import os, sys
 ROOT_DIR = os.path.abspath(os.curdir)
 
 def main():

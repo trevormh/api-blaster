@@ -1,5 +1,4 @@
 import sys, os, re
-
 from api_blaster.request.builder.abstract_builder import AbstractBuilder
 from api_blaster.request.http_request import HttpRequest
 import json
@@ -8,7 +7,6 @@ from dotenv import load_dotenv
 
 class RequestBuilder(AbstractBuilder):
 
-    env_regex = "{{(.*?)}}(?!})"
     default_method = 'GET'
 
     def __init__(self, directory: str, filename: str):
@@ -29,10 +27,12 @@ class RequestBuilder(AbstractBuilder):
         try:
             with open(path) as f:
                 return json.load(f)
-        except IOError as e:
-            print(e)
-        except:
-            print(f"Unexpected error attempting to read {path}: {sys.exc_info()[0]}")
+        except Exception as e:
+            if sys.exc_info()[0].__name__ == 'JSONDecodeError':
+                msg = f"Invalid JSON detected in {path}"
+            else:
+                msg = f"Unexpected error attempting to read {path}"
+            raise Exception(msg)
 
     def build(self) -> HttpRequest:
         self.set_url()
@@ -45,17 +45,13 @@ class RequestBuilder(AbstractBuilder):
             try:
                 item = item.replace("{{" + env + "}}", os.getenv(env))
             except Exception as e:
-                # TODO implement better warning handling
-                import warnings
-                warning = '\33[33m'
-                end = '\033[0m'
-                warnings.warn(
-                    f"{warning}.env file missing variable {env} used by request{end}",
-                    RuntimeWarning, stacklevel=2, source=None)
+                if self.env_loaded:
+                    raise NameError(f"env variable used by request missing from .env file: {env}")
+
         return item
 
     def find_env_var(self, s: str) -> list:
-        return re.findall(rf"{self.env_regex}", s)
+        return re.findall(r"{{(.*?)}}(?!})", s)
 
     def set_url(self):
         url = self.request_config['url']
@@ -63,11 +59,7 @@ class RequestBuilder(AbstractBuilder):
         if env_vars and self.env_loaded:
             url = self.apply_env_vars(url, env_vars)
         elif env_vars and not self.env_loaded:
-            # TODO implement better warning handling
-            import warnings
-            warning = '\33[33m'
-            end = '\033[0m'
-            warnings.warn(f"{warning}Request contains env variables, but no .env file was found in the following directory at the following path: {self.path}{end}", RuntimeWarning, stacklevel=2, source=None)
+            raise FileNotFoundError(f"Request contains env variables, but no .env file was found in this directory: {self.path}")
         self.request.url = url
 
     def set_headers(self):
