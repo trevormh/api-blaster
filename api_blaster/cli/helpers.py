@@ -5,7 +5,7 @@ from api_blaster.cli.commands.command import Command
 
 #  https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
 class CLI_COLORS:
-    EXCEPTION = '\33[91m'  # red
+    CRITICAL = '\33[91m'  # red
     END = '\033[0m'
     REQUEST = '\33[32m' # Green
     INFO = '\33[34m'  # Blue
@@ -21,7 +21,7 @@ def info(message: str):
 
 
 def apply_critical_style(message: str) -> str:
-    return f"{CLI_COLORS.EXCEPTION}{message}{CLI_COLORS.END}"
+    return f"{CLI_COLORS.CRITICAL}{message}{CLI_COLORS.END}"
 
 
 def critical(message: str):

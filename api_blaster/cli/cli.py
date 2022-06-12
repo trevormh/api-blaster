@@ -35,7 +35,6 @@ class CLI:
     def print_menu(self, items):
         info(f"Directory: {self.menu.cur_directory()}")
         styled = style_menu_items(items)
-        # breakpoint()
         self.cmd.columnize(styled, displaywidth=80)
 
     def handle_nav(self, cmd: str):
@@ -54,7 +53,8 @@ class CLI:
             idx = commands.index(cmd)
             self.get_commands()[idx].execute()
         except ValueError:
-            print(f"Item '{cmd}' not found", end="\n\n")
+            from api_blaster.cli.helpers import warn
+            warn(f"Item '{cmd}' not found")
 
 
 def main():
