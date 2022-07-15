@@ -1,17 +1,17 @@
 import configparser
 import os
 
-from api_blaster.cli.helpers import warn
-
 ROOT_DIR = os.path.abspath(os.curdir)
 
 SETTINGS_DIR = f"{os.path.dirname(os.path.realpath(__file__))}/cli/commands/settings"
-REQUESTS_DIR = f'{ROOT_DIR}/config.ini'
+REQUESTS_DIR = ''
 config = configparser.ConfigParser()
 
 
 def get_requests_dir():
     global REQUESTS_DIR
+    if not REQUESTS_DIR:
+        initialize_requests_dir()
     return REQUESTS_DIR
 
 
