@@ -29,10 +29,15 @@ def critical(message: str):
 
 
 def apply_warn_style(message: str) -> str:
-    return f"{CLI_COLORS.WARNING}WARNING: {message}{CLI_COLORS.END}"
+    return f"{CLI_COLORS.WARNING}{message}{CLI_COLORS.END}"
 
 
 def warn(message: str):
+    message = f'WARNING: {message}'
+    print(f'{apply_warn_style(message)}', end="\n")
+
+
+def alert(message: str):
     print(apply_warn_style(message), end="\n")
 
 

@@ -2,7 +2,7 @@ import cmd
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
-from api_blaster.__main__ import ROOT_DIR, REQUESTS_DIR, SETTINGS_DIR
+from api_blaster.__main__ import ROOT_DIR, get_requests_dir, SETTINGS_DIR
 from api_blaster.cli.commands.settings_command import SettingsCommand
 from api_blaster.cli.menu_builder import MenuBuilder
 from api_blaster.cli.helpers import info, style_menu_items
@@ -42,7 +42,7 @@ class CLI:
         if cmd == 'cd ..':
             if self.menu.cur_directory() == "settings":
                 # user exited settings, return to request directory
-                self.menu.set_dir(REQUESTS_DIR)
+                self.menu.set_dir(get_requests_dir())
             else:
                 self.menu.nav_up()
         elif cmd == 'exit':
@@ -50,7 +50,7 @@ class CLI:
         elif cmd == "settings":
             self.menu.set_dir(SETTINGS_DIR)
 
-    def execute(self, cmd: str):
+    def handle_execute_command(self, cmd: str):
         if not cmd:
             return
         elif cmd in self.hidden_cmds:
@@ -66,7 +66,9 @@ class CLI:
 
 
 def main():
-    menu = MenuBuilder(REQUESTS_DIR)
+    print('in main')
+    print(get_requests_dir())
+    menu = MenuBuilder(get_requests_dir())
     cli = CLI(menu)
     while True:
         try:
@@ -74,7 +76,7 @@ def main():
             cli.print_menu(commands)
             items.extend(cli.hidden_cmds)
             selection = prompt('> ', completer=WordCompleter(items))
-            cli.execute(selection)
+            cli.handle_execute_command(selection)
         except (FileNotFoundError, NameError, IOError) as err:
             from api_blaster.cli.helpers import critical
             critical(f"Failed to execute request.\n{err.args[0]}")
