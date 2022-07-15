@@ -2,8 +2,7 @@ import cmd
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
-from api_blaster.__main__ import ROOT_DIR, get_requests_dir, SETTINGS_DIR
-from api_blaster.cli.commands.settings_command import SettingsCommand
+from api_blaster.__main__ import get_requests_dir, SETTINGS_DIR
 from api_blaster.cli.menu_builder import MenuBuilder
 from api_blaster.cli.helpers import info, style_menu_items
 from typing import TYPE_CHECKING

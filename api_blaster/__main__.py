@@ -17,11 +17,11 @@ def get_requests_dir():
 
 def initialize_requests_dir():
     try:
-        config.read(SETTINGS_DIR + '/update_requests_directory.ini')
+        config.read(SETTINGS_DIR + '/requests_directory.ini')
         requests_dir = config['APP']['REQUESTS_DIRECTORY']
         set_requests_dir(requests_dir)
     except FileNotFoundError:
-        print('update_requests_directory.ini file not found, using default requests directory')
+        print('requests_directory.ini file not found, using default requests directory')
         print(f'requests directory path: {REQUESTS_DIR}')
     except Exception as exp:
         print('Failed to initialize requests dir')

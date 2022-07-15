@@ -22,7 +22,7 @@ class SettingsCommand(Command):
 
     def execute(self):
         # self.__read_config_file()
-        if self.setting == 'update_requests_directory.ini':
+        if self.setting == 'requests_directory.ini':
             self.__update_requests_directory()
         else:
             return
