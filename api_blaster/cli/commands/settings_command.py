@@ -3,7 +3,8 @@ import os
 from api_blaster.cli.commands.command import Command
 import configparser
 from typing import TYPE_CHECKING
-from api_blaster.__main__ import REQUESTS_DIR, set_requests_dir
+# from api_blaster.__main__ import REQUESTS_DIR, set_requests_dir
+from api_blaster.app_configs import AppConfigs
 
 from api_blaster.cli.helpers import info, warn, critical, alert
 
@@ -67,7 +68,8 @@ class SettingsCommand(Command):
         info(f'Current request directory: {cur_config}')
         if new_dir := input('Please enter new requests directory path (press enter to cancel): '):
             config['value'] = new_dir
-            if update_dir_var := set_requests_dir(new_dir) and self.update_config(config):
+
+            if update_dir_var := AppConfigs().set_config('REQUESTS_DIR', new_dir) and self.update_config(config):
                 print('Request directory updated successfully')
             # update_config returns False if the directory does not exist
             # make the user enter a valid directory when this happens
@@ -83,7 +85,7 @@ class SettingsCommand(Command):
         info(f'Current responses directory: {cur_config}')
         if new_dir := input('Please enter new responses directory path (press enter to cancel): '):
             config['value'] = new_dir
-            if update_dir_var := set_requests_dir(new_dir) and self.update_config(config):
+            if update_dir_var := AppConfigs().set_config('RESPONSES_DIR', new_dir) and self.update_config(config):
                 print('Responses directory updated successfully')
             # update_config returns False if the directory does not exist
             # make the user enter a valid directory when this happens
