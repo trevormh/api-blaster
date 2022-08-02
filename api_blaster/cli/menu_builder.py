@@ -1,5 +1,4 @@
-# from api_blaster.__main__ import ROOT_DIR, SETTINGS_DIR, get_requests_dir
-from api_blaster.app_configs import AppConfigs
+from api_blaster.cfg import get_config
 import os
 from typing import List, TYPE_CHECKING, Union
 
@@ -37,7 +36,7 @@ class MenuBuilder:
 
     def nav_up(self):
         # don't allow backing out beyond the requests directory!
-        requests_dir = AppConfigs().get_config('REQUESTS_DIR')
+        requests_dir = get_config('REQUESTS_DIR')
         if self.dir != requests_dir:
             self.set_dir(self.dir.rpartition("/")[0])
             # self._set_commands()
@@ -62,7 +61,7 @@ class MenuBuilder:
             item_path = f"{self.dir}/{item}"
             if item in self.exclude:
                 continue
-            elif self.dir == AppConfigs().get_config('SETTINGS_DIR'):
+            elif self.dir == get_config('SETTINGS_DIR'):
                 commands.append(SettingsCommand(item))
             elif os.path.isdir(item_path):
                 commands.append(DirectoryCommand(self, item_path))

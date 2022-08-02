@@ -20,6 +20,7 @@ class AppConfigs:
 
     def __load_requests_dir(self):
         try:
+            # os.path.join(data_dir, file_name)
             self.config_parser.read(self.__dict__['SETTINGS_DIR'] + '/requests_directory.ini')
             requests_dir = self.config_parser['APP']['REQUESTS_DIR']
             self.set_config('REQUESTS_DIR', requests_dir)

@@ -3,8 +3,7 @@ import os
 from api_blaster.cli.commands.command import Command
 import configparser
 from typing import TYPE_CHECKING
-# from api_blaster.__main__ import REQUESTS_DIR, set_requests_dir
-from api_blaster.app_configs import AppConfigs
+from api_blaster.cfg import set_config
 
 from api_blaster.cli.helpers import info, warn, critical, alert
 
@@ -20,7 +19,6 @@ class SettingsCommand(Command):
         self.config = configparser.ConfigParser()
         self.config_path = f"{self.path}/{self.setting}"
 
-
     def execute(self):
         # self.__read_config_file()
         if self.setting == 'requests_directory.ini':
@@ -29,6 +27,8 @@ class SettingsCommand(Command):
             self.__update_responses_directory()
         elif self.setting == 'number_responses_retained.ini':
             self.__update_number_responses()
+        elif self.setting == "suppress_output.ini":
+            self.__update_suppress_output()
         else:
             return
 
@@ -68,8 +68,8 @@ class SettingsCommand(Command):
         info(f'Current request directory: {cur_config}')
         if new_dir := input('Please enter new requests directory path (press enter to cancel): '):
             config['value'] = new_dir
-
-            if update_dir_var := AppConfigs().set_config('REQUESTS_DIR', new_dir) and self.update_config(config):
+            # TODO: move writing/updating of config to cfg.py
+            if update_dir_var := set_config('REQUESTS_DIR', new_dir) and self.update_config(config):
                 print('Request directory updated successfully')
             # update_config returns False if the directory does not exist
             # make the user enter a valid directory when this happens
@@ -85,7 +85,8 @@ class SettingsCommand(Command):
         info(f'Current responses directory: {cur_config}')
         if new_dir := input('Please enter new responses directory path (press enter to cancel): '):
             config['value'] = new_dir
-            if update_dir_var := AppConfigs().set_config('RESPONSES_DIR', new_dir) and self.update_config(config):
+            # TODO: move writing/updating of config to cfg.py
+            if update_dir_var := set_config('RESPONSES_DIR', new_dir) and self.update_config(config):
                 print('Responses directory updated successfully')
             # update_config returns False if the directory does not exist
             # make the user enter a valid directory when this happens
@@ -105,6 +106,7 @@ class SettingsCommand(Command):
         info(f'About: {config_info}')
         if new_num := input('Please enter number of responses to retain (press enter to cancel): '):
             value_config['value'] = new_num
+            # TODO: move writing/updating of config to cfg.py
             if new_num_valid := new_num.isdigit() and self.update_config(value_config):
                 alert('Number of retained responses updated successfully')
             elif not new_num_valid:
@@ -112,3 +114,25 @@ class SettingsCommand(Command):
                 self.__update_number_responses()
             else:
                 critical('Error occurred, number of retained responses was not updated.')
+
+    def __update_suppress_output(self):
+        value_config = {'section': 'APP', 'setting': 'SUPPRESS_OUTPUT'}
+        cur_config_value = self.get_config_value(value_config)
+        info(f'Current suppress output value: {cur_config_value}')
+
+        info_config = {'section': 'APP', 'setting': 'INFO'}
+        config_info = self.get_config_value(info_config)
+        info(f'About: {config_info}')
+
+        suppress = input('Suppress output? (True or False): ').capitalize()
+        if suppress in ['True', 'False']:
+            # TODO: move writing/updating of config to cfg.py
+            value_config['value'] = suppress
+            if self.update_config(value_config):
+                alert('Suppress output setting updated successfully')
+            else:
+                critical('Error occurred, suppress output setting was not updated.')
+            set_config('SUPPRESS_OUTPUT', suppress)
+        elif suppress != '':
+            alert(f"{suppress} is not a valid selection. Please choose True or False")
+            self.__update_suppress_output()

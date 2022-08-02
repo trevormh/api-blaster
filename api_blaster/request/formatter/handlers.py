@@ -1,5 +1,7 @@
+from api_blaster.cfg import get_config
 from api_blaster.request.formatter.handler import Handler
 from typing import Any, List, Callable, Union
+from distutils.util import strtobool
 
 
 class ProtocolHandler(Handler):
@@ -28,9 +30,18 @@ class AuthHandler(Handler):
             return None
 
 
+class SuppressOutputHandler(Handler):
+    def next(self, request: Any, req_list: List[str]) -> list[str]:
+        if strtobool(get_config('SUPPRESS_OUTPUT')):
+            req_list.append("--quiet")
+            print('Output Suppressed')
+        else:
+            req_list.append('--pretty=all')
+        return super().next(request, req_list)
+
+
 class MethodHandler(Handler):
     def next(self, request: Any, req_list: List[str]) -> list[str]:
-        # breakpoint()
         req_list.append(request.headers['method'])
         return super().next(request, req_list)
 
