@@ -1,22 +1,24 @@
 import configparser, os
 
+from api_blaster.settings.config_file_map import config_map
+
 app_configs = {}
 
 
 def initialize_configs(root_dir: str):
     app_configs['ROOT_DIR'] = root_dir
-    app_configs['SETTINGS_DIR'] = os.path.join(root_dir, 'api_blaster', 'cli', 'commands', 'settings')
+    app_configs['SETTINGS_DIRECTORY'] = os.path.join(root_dir, 'api_blaster', 'settings', 'configs')
     __load_config_files()
 
 
 def __load_config_files():
     config = configparser.ConfigParser()
-    __load_config(config, 'REQUESTS_DIR', 'requests_directory.ini')
-    __load_config(config, 'SUPPRESS_OUTPUT', 'suppress_output.ini')
+    for config_name, filename in config_map.items():
+        __load_config(config, config_name, filename)
 
 
 def __load_config(config_parser, config_name: str, config_filename: str):
-    path = os.path.join(app_configs['SETTINGS_DIR'], config_filename)
+    path = os.path.join(app_configs['SETTINGS_DIRECTORY'], config_filename)
     try:
         if not os.path.isfile(path):
             raise FileNotFoundError
@@ -26,8 +28,7 @@ def __load_config(config_parser, config_name: str, config_filename: str):
     except FileNotFoundError:
         print(f'File not found: {path}')
     except Exception as exp:
-        print(exp)
-        print('Failed to initialize requests dir')
+        print(f'Failed to initialize {exp}')
 
 
 def set_config(config_name: str, value: any):

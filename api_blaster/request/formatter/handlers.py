@@ -1,6 +1,6 @@
-from api_blaster.cfg import get_config
+from api_blaster.settings.cfg import get_config
 from api_blaster.request.formatter.handler import Handler
-from typing import Any, List, Callable, Union
+from typing import Any, List, Union
 from distutils.util import strtobool
 
 

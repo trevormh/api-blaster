@@ -3,21 +3,20 @@ import os
 from api_blaster.cli.commands.command import Command
 import configparser
 from typing import TYPE_CHECKING
-from api_blaster.cfg import set_config
+from api_blaster.settings.cfg import set_config, get_config
 
-from api_blaster.cli.helpers import info, warn, critical, alert
+from api_blaster.cli.helpers import info, critical, alert
 
 if TYPE_CHECKING:
-    from api_blaster.cli.menu_builder import MenuBuilder
+    pass
 
 
 class SettingsCommand(Command):
 
-    def __init__(self, setting: str):
-        self.path = f"{os.path.dirname(os.path.realpath(__file__))}/settings"
-        self.setting = setting
+    def __init__(self, setting_name: str):
+        self.setting = setting_name
         self.config = configparser.ConfigParser()
-        self.config_path = f"{self.path}/{self.setting}"
+        self.config_path = os.path.join(get_config('SETTINGS_DIRECTORY'), self.setting)
 
     def execute(self):
         # self.__read_config_file()
@@ -49,7 +48,7 @@ class SettingsCommand(Command):
             setting = config['setting']
             return self.config[section][setting]
         except Exception as e:
-            print(e)
+            print(f'Failed to get config: {e}')
 
     def update_config(self, new_config: dict) -> bool:
         try:
@@ -69,7 +68,7 @@ class SettingsCommand(Command):
         if new_dir := input('Please enter new requests directory path (press enter to cancel): '):
             config['value'] = new_dir
             # TODO: move writing/updating of config to cfg.py
-            if update_dir_var := set_config('REQUESTS_DIR', new_dir) and self.update_config(config):
+            if update_dir_var := set_config('REQUESTS_DIRECTORY', new_dir) and self.update_config(config):
                 print('Request directory updated successfully')
             # update_config returns False if the directory does not exist
             # make the user enter a valid directory when this happens
@@ -86,7 +85,7 @@ class SettingsCommand(Command):
         if new_dir := input('Please enter new responses directory path (press enter to cancel): '):
             config['value'] = new_dir
             # TODO: move writing/updating of config to cfg.py
-            if update_dir_var := set_config('RESPONSES_DIR', new_dir) and self.update_config(config):
+            if update_dir_var := set_config('RESPONSES_DIRECTORY', new_dir) and self.update_config(config):
                 print('Responses directory updated successfully')
             # update_config returns False if the directory does not exist
             # make the user enter a valid directory when this happens

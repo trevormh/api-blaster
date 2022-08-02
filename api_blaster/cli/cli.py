@@ -2,7 +2,7 @@ import cmd
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
-from api_blaster.cfg import get_config
+from api_blaster.settings.cfg import get_config
 from api_blaster.cli.menu_builder import MenuBuilder
 from api_blaster.cli.helpers import info, style_menu_items
 from typing import TYPE_CHECKING
@@ -41,14 +41,14 @@ class CLI:
         if cmd == 'cd ..':
             if self.menu.cur_directory() == "settings":
                 # user exited settings, return to request directory
-                request_dir = get_config('REQUESTS_DIR')
+                request_dir = get_config('REQUESTS_DIRECTORY')
                 self.menu.set_dir(request_dir)
             else:
                 self.menu.nav_up()
         elif cmd == 'exit':
             raise KeyboardInterrupt
         elif cmd == "settings":
-            settings_dir = get_config('SETTINGS_DIR')
+            settings_dir = get_config('SETTINGS_DIRECTORY')
             self.menu.set_dir(settings_dir)
 
     def handle_execute_command(self, cmd: str):
@@ -67,7 +67,7 @@ class CLI:
 
 
 def main():
-    menu = MenuBuilder(get_config('REQUESTS_DIR'))
+    menu = MenuBuilder(get_config('REQUESTS_DIRECTORY'))
     cli = CLI(menu)
     while True:
         try:

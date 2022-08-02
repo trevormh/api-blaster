@@ -2,7 +2,7 @@ import cmd
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
-from api_blaster.cfg import get_config
+from api_blaster.settings.cfg import get_config
 from api_blaster.cli.menu_builder import MenuBuilder
 from api_blaster.cli.helpers import info, style_menu_items
 from typing import TYPE_CHECKING

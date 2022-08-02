@@ -1,7 +1,6 @@
-from api_blaster.cfg import get_config
 from api_blaster.request.formatter.handler import Handler
 import api_blaster.request.formatter.handlers as handlers
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from api_blaster.request.http_request import HttpRequest
