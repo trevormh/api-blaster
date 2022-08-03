@@ -1,11 +1,13 @@
 import os
+import sys
 
 from api_blaster.cli.commands.command import Command
 import configparser
 from typing import TYPE_CHECKING
-from api_blaster.settings.cfg import set_config, get_config
+from api_blaster.settings.cfg import set_app_config, get_config, update_config, get_config_info
 
 from api_blaster.cli.helpers import info, critical, alert
+from api_blaster.settings.config_file_map import config_map, config_file_map
 
 if TYPE_CHECKING:
     pass
@@ -13,26 +15,26 @@ if TYPE_CHECKING:
 
 class SettingsCommand(Command):
 
-    def __init__(self, setting_name: str):
-        self.setting = setting_name
+    def __init__(self, config_file: str):
+        self.config_file = config_file
+        self.config_name = config_file_map.get(config_file)
         self.config = configparser.ConfigParser()
-        self.config_path = os.path.join(get_config('SETTINGS_DIRECTORY'), self.setting)
+        self.config_path = os.path.join(get_config('SETTINGS_DIR'), self.config_file)
 
     def execute(self):
-        # self.__read_config_file()
-        if self.setting == 'requests_directory.ini':
+        if self.config_name == 'REQUESTS_DIR':
             self.__update_requests_directory()
-        elif self.setting == 'responses_directory.ini':
+        elif self.config_name == 'RESPONSES_DIR':
             self.__update_responses_directory()
-        elif self.setting == 'number_responses_retained.ini':
+        elif self.config_name == 'NUMBER_RESPONSES_RETAINED':
             self.__update_number_responses()
-        elif self.setting == "suppress_output.ini":
+        elif self.config_name == 'SUPPRESS_OUTPUT':
             self.__update_suppress_output()
         else:
             return
 
     def __repr__(self):
-        name = self.setting.rpartition(".")
+        name = self.config_file.rpartition(".")
         return name[0].replace("_", " ").title()
 
     def __read_config_file(self):
@@ -41,97 +43,53 @@ class SettingsCommand(Command):
         except Exception as e:
             print(e)
 
-    def get_config_value(self, config: dict):
-        self.__read_config_file()
-        try:
-            section = config['section']
-            setting = config['setting']
-            return self.config[section][setting]
-        except Exception as e:
-            print(f'Failed to get config: {e}')
-
-    def update_config(self, new_config: dict) -> bool:
-        try:
-            with open(self.config_path, 'w') as configfile:
-                section = new_config['section']
-                setting = new_config['setting']
-                self.config[section][setting] = new_config['value']
-                self.config.write(configfile)
-                return True
-        except Exception as e:
-            print(e)
-
     def __update_requests_directory(self):
-        config = {'section': 'APP', 'setting': 'REQUESTS_DIRECTORY'}
-        cur_config = self.get_config_value(config)
-        info(f'Current request directory: {cur_config}')
+        info(f'Current request directory: {get_config(self.config_name)}')
         if new_dir := input('Please enter new requests directory path (press enter to cancel): '):
-            config['value'] = new_dir
-            # TODO: move writing/updating of config to cfg.py
-            if update_dir_var := set_config('REQUESTS_DIRECTORY', new_dir) and self.update_config(config):
-                print('Request directory updated successfully')
-            # update_config returns False if the directory does not exist
-            # make the user enter a valid directory when this happens
-            elif not update_dir_var:
+            if os.path.isdir(new_dir):
+                if update_config(self.config_path, self.config_name, value=new_dir):
+                    print('Request directory updated successfully')
+                else:
+                    alert(f'Failed to update config {self.config_name}')
+            else:
                 alert(f'{new_dir} does not exist. Please choose another directory.')
                 self.__update_requests_directory()
-            else:
-                critical('Error occurred, requests directory was not updated.')
 
     def __update_responses_directory(self):
-        config = {'section': 'APP', 'setting': 'RESPONSES_DIRECTORY'}
-        cur_config = self.get_config_value(config)
-        info(f'Current responses directory: {cur_config}')
+        info(f'Current responses directory: {get_config(self.config_name)}')
         if new_dir := input('Please enter new responses directory path (press enter to cancel): '):
-            config['value'] = new_dir
-            # TODO: move writing/updating of config to cfg.py
-            if update_dir_var := set_config('RESPONSES_DIRECTORY', new_dir) and self.update_config(config):
-                print('Responses directory updated successfully')
-            # update_config returns False if the directory does not exist
-            # make the user enter a valid directory when this happens
-            elif not update_dir_var:
+            if os.path.isdir(new_dir):
+                if update_config(self.config_path, self.config_name, value=new_dir):
+                    print('Responses directory updated successfully')
+                else:
+                    alert(f'Failed to update config {self.config_name}')
+            else:
                 alert(f'{new_dir} does not exist. Please choose another directory.')
                 self.__update_responses_directory()
-            else:
-                critical('Error occurred, responses directory was not updated.')
 
     def __update_number_responses(self):
-        value_config = {'section': 'APP', 'setting': 'NUMBER_RESPONSES_RETAINED'}
-        cur_config_value = self.get_config_value(value_config)
-        info(f'Current number of responses retained: {cur_config_value}')
-
-        info_config = {'section': 'APP', 'setting': 'INFO'}
-        config_info = self.get_config_value(info_config)
-        info(f'About: {config_info}')
+        info(f'Current number of responses retained: {get_config(self.config_name)}')
+        info(f'About: {get_config_info(self.config_name)}')
         if new_num := input('Please enter number of responses to retain (press enter to cancel): '):
-            value_config['value'] = new_num
-            # TODO: move writing/updating of config to cfg.py
-            if new_num_valid := new_num.isdigit() and self.update_config(value_config):
-                alert('Number of retained responses updated successfully')
-            elif not new_num_valid:
+            if new_num.isdigit():
+                if update_config(self.config_path, self.config_name, value=new_num):
+                    print('Number of retained responses updated successfully')
+                else:
+                    alert(f'Failed to update config {self.config_name}')
+            else:
                 alert('Please enter a number')
                 self.__update_number_responses()
-            else:
-                critical('Error occurred, number of retained responses was not updated.')
 
     def __update_suppress_output(self):
-        value_config = {'section': 'APP', 'setting': 'SUPPRESS_OUTPUT'}
-        cur_config_value = self.get_config_value(value_config)
-        info(f'Current suppress output value: {cur_config_value}')
-
-        info_config = {'section': 'APP', 'setting': 'INFO'}
-        config_info = self.get_config_value(info_config)
-        info(f'About: {config_info}')
+        info(f'Current suppress output value: {get_config(self.config_name)}')
+        info(f'About: {get_config_info(self.config_name)}')
 
         suppress = input('Suppress output? (True or False): ').capitalize()
         if suppress in ['True', 'False']:
-            # TODO: move writing/updating of config to cfg.py
-            value_config['value'] = suppress
-            if self.update_config(value_config):
+            if update_config(self.config_path, self.config_name, value=suppress):
                 alert('Suppress output setting updated successfully')
             else:
-                critical('Error occurred, suppress output setting was not updated.')
-            set_config('SUPPRESS_OUTPUT', suppress)
+                alert(f'Failed to update config {self.config_name}')
         elif suppress != '':
             alert(f"{suppress} is not a valid selection. Please choose True or False")
             self.__update_suppress_output()

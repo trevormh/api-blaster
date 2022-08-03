@@ -9,7 +9,7 @@ class AppConfigs:
         self.__dict__ = self.__configs
         if not len(self.__dict__):
             self.__dict__['ROOT_DIR'] = root_dir
-            self.__dict__['SETTINGS_DIRECTORY'] = f"{os.path.dirname(os.path.realpath(__file__))}/cli/commands/settings"
+            self.__dict__['SETTINGS_DIR'] = f"{os.path.dirname(os.path.realpath(__file__))}/cli/commands/settings"
             self.config_parser = configparser.ConfigParser()
             self.load_cfg_files()
 
@@ -21,12 +21,12 @@ class AppConfigs:
     def __load_requests_dir(self):
         try:
             # os.path.join(data_dir, file_name)
-            self.config_parser.read(self.__dict__['SETTINGS_DIRECTORY'] + '/requests_directory.ini')
-            requests_dir = self.config_parser['APP']['REQUESTS_DIRECTORY']
-            self.set_config('REQUESTS_DIRECTORY', requests_dir)
+            self.config_parser.read(self.__dict__['SETTINGS_DIR'] + '/requests_directory.ini')
+            requests_dir = self.config_parser['APP']['REQUESTS_DIR']
+            self.set_config('REQUESTS_DIR', requests_dir)
         except FileNotFoundError:
             print('requests_directory.ini file not found, using default requests directory')
-            print(f"requests directory path: {self.__dict__['REQUESTS_DIRECTORY']}")
+            print(f"requests directory path: {self.__dict__['REQUESTS_DIR']}")
         except Exception as exp:
             print('Failed to initialize requests dir')
 

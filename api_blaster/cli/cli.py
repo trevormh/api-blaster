@@ -41,14 +41,14 @@ class CLI:
         if cmd == 'cd ..':
             if self.menu.cur_directory() == "settings":
                 # user exited settings, return to request directory
-                request_dir = get_config('REQUESTS_DIRECTORY')
+                request_dir = get_config('REQUESTS_DIR')
                 self.menu.set_dir(request_dir)
             else:
                 self.menu.nav_up()
         elif cmd == 'exit':
             raise KeyboardInterrupt
         elif cmd == "settings":
-            settings_dir = get_config('SETTINGS_DIRECTORY')
+            settings_dir = get_config('SETTINGS_DIR')
             self.menu.set_dir(settings_dir)
 
     def handle_execute_command(self, cmd: str):
@@ -67,7 +67,7 @@ class CLI:
 
 
 def main():
-    menu = MenuBuilder(get_config('REQUESTS_DIRECTORY'))
+    menu = MenuBuilder(get_config('REQUESTS_DIR'))
     cli = CLI(menu)
     while True:
         try:

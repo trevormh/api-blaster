@@ -18,7 +18,7 @@ def get_requests_dir():
 def initialize_requests_dir():
     try:
         config.read(SETTINGS_DIR + '/requests_directory.ini')
-        requests_dir = config['APP']['REQUESTS_DIRECTORY']
+        requests_dir = config['APP']['REQUESTS_DIR']
         set_requests_dir(requests_dir)
     except FileNotFoundError:
         print('requests_directory.ini file not found, using default requests directory')

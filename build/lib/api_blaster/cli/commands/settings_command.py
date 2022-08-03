@@ -58,7 +58,7 @@ class SettingsCommand(Command):
             print(e)
 
     def __update_requests_directory(self):
-        config = {'section': 'APP', 'setting': 'REQUESTS_DIRECTORY'}
+        config = {'section': 'APP', 'setting': 'REQUESTS_DIR'}
         cur_config = self.get_config_value(config)
         info(f'Current request directory: {cur_config}')
         new_dir = input('Please enter new requests directory path (press enter to cancel): ')
