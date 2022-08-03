@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 
 class SettingsCommand(Command):
 
-    def __init__(self, config_file: str):
-        self.config_file = config_file
-        self.config_name = config_file_map.get(config_file)
+    def __init__(self, filename: str):
+        self.filename = filename
+        self.config_name = config_file_map.get(filename)
         self.config = configparser.ConfigParser()
-        self.config_path = os.path.join(get_config('SETTINGS_DIR'), self.config_file)
+        self.config_path = os.path.join(get_config('SETTINGS_DIR'), self.filename)
 
     def execute(self):
         if self.config_name == 'REQUESTS_DIR':
@@ -34,7 +34,7 @@ class SettingsCommand(Command):
             return
 
     def __repr__(self):
-        name = self.config_file.rpartition(".")
+        name = self.filename.rpartition(".")
         return name[0].replace("_", " ").title()
 
     def __read_config_file(self):
@@ -83,7 +83,6 @@ class SettingsCommand(Command):
     def __update_suppress_output(self):
         info(f'Current suppress output value: {get_config(self.config_name)}')
         info(f'About: {get_config_info(self.config_name)}')
-
         suppress = input('Suppress output? (True or False): ').capitalize()
         if suppress in ['True', 'False']:
             if update_config(self.config_path, self.config_name, value=suppress):

@@ -27,6 +27,9 @@ class MenuBuilder:
         self.dir = new_dir
         self._set_commands()
 
+    def get_dir(self):
+        return self.dir
+
     def _set_commands(self):
         commands = self._read_contents()
         self._set_dot_env_path()
@@ -42,7 +45,7 @@ class MenuBuilder:
             self.set_dir(self.dir.rpartition("/")[0])
             # self._set_commands()
 
-    def cur_directory(self):
+    def cur_directory_name(self):
         return self.dir.rpartition("/")[2]
 
     def _set_dot_env_path(self):
@@ -63,7 +66,7 @@ class MenuBuilder:
             if item in self.exclude:
                 continue
             elif self.dir == get_config('SETTINGS_DIR'):
-                commands.append(SettingsCommand(config_file=item))
+                commands.append(SettingsCommand(filename=item))
             elif os.path.isdir(item_path):
                 commands.append(DirectoryCommand(self, item_path))
             elif os.path.isfile(item_path):

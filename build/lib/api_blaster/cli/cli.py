@@ -33,13 +33,13 @@ class CLI:
         return [commands, menu_items]
 
     def print_menu(self, items):
-        info(f"Directory: {self.menu.cur_directory()}")
+        info(f"Directory: {self.menu.cur_directory_name()}")
         styled = style_menu_items(items)
         self.cmd.columnize(styled, displaywidth=80)
 
     def handle_hidden_cmd(self, cmd: str):
         if cmd == 'cd ..':
-            if self.menu.cur_directory() == "settings":
+            if self.menu.cur_directory_name() == "settings":
                 # user exited settings, return to request directory
                 request_dir = get_config('REQUESTS_DIR')
                 self.menu.set_dir(request_dir)
