@@ -37,12 +37,6 @@ class SettingsCommand(Command):
         name = self.filename.rpartition(".")
         return name[0].replace("_", " ").title()
 
-    def __read_config_file(self):
-        try:
-            self.config.read(self.config_path)
-        except Exception as e:
-            print(e)
-
     def __update_requests_directory(self):
         info(f'Current request directory: {get_config(self.config_name)}')
         if new_dir := input('Please enter new requests directory path (press enter to cancel): '):

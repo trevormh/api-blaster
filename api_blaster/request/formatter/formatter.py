@@ -19,17 +19,15 @@ class Formatter:
         method = handlers.MethodHandler()
         url = handlers.URLHandler()
         suppress = handlers.SuppressOutputHandler()
+        save_response = handlers.SaveResponseHandler()
 
         protocol \
             .set_next(auth) \
             .set_next(form) \
             .set_next(method) \
             .set_next(url) \
-            .set_next(suppress)
-
-        # if get_config('SUPPRESS_OUTPUT'):
-        #     suppress = handlers.SuppressOutputHandler()
-        #     protocol.set_next(suppress)
+            .set_next(suppress) \
+            .set_next(save_response)
 
         return protocol
 

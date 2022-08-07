@@ -17,8 +17,3 @@ config_file_map = {
     'responses_directory.ini': 'RESPONSES_DIR',
     'suppress_output.ini': 'SUPPRESS_OUTPUT',
 }
-
-
-def get_config_filename(config: str):
-    return config_map.get(config)
-

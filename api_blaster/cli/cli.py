@@ -26,11 +26,11 @@ class CLI:
 
     def menu_items(self):
         commands = []
-        menu_items = []
+        display_text = []
         for item in self.get_commands():
             commands.append(item)
-            menu_items.append(repr(item))
-        return [commands, menu_items]
+            display_text.append(repr(item))
+        return [commands, display_text]
 
     def print_menu(self, items):
         info(f"Directory: {self.menu.cur_directory_name()}")
@@ -40,7 +40,7 @@ class CLI:
     def handle_hidden_cmd(self, cmd: str):
         if cmd == 'cd ..':
             if self.menu.get_dir() == get_config('SETTINGS_DIR'):
-                # user exited settings, return to request directory
+                # user was in settings menu and wants to exit, return to request directory
                 request_dir = get_config('REQUESTS_DIR')
                 self.menu.set_dir(request_dir)
             else:
@@ -71,10 +71,10 @@ def main():
     cli = CLI(menu)
     while True:
         try:
-            commands, items = cli.menu_items()
+            commands, display_text = cli.menu_items()
             cli.print_menu(commands)
-            items.extend(cli.hidden_cmds)
-            selection = prompt('> ', completer=WordCompleter(items))
+            display_text.extend(cli.hidden_cmds)
+            selection = prompt('> ', completer=WordCompleter(display_text))
             cli.handle_execute_command(selection)
         except (FileNotFoundError, NameError, IOError) as err:
             from api_blaster.cli.helpers import critical
