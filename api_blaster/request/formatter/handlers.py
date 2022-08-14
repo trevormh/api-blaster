@@ -55,6 +55,7 @@ class SaveResponseHandler(Handler):
             response_name = os.path.join(self.responses_dir, f'{time.time()}_{request.name}.txt')
             request_params.append('--output')
             request_params.append(response_name)
+            print(f'Output saved to: {response_name}')
             self.__handle_old_files()
         return super().next(request, request_params)
 

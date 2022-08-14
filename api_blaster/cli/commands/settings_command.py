@@ -5,9 +5,8 @@ from api_blaster.cli.commands.command import Command
 import configparser
 from typing import TYPE_CHECKING
 from api_blaster.settings.cfg import set_app_config, get_config, update_config, get_config_info
-
 from api_blaster.cli.helpers import info, critical, alert
-from api_blaster.settings.config_file_map import config_map, config_file_map
+from api_blaster.settings.config_file_map import ConfigFileName, ConfigName
 
 if TYPE_CHECKING:
     pass
@@ -17,18 +16,18 @@ class SettingsCommand(Command):
 
     def __init__(self, filename: str):
         self.filename = filename
-        self.config_name = config_file_map.get(filename)
+        self.config_name = ConfigFileName(filename).name
         self.config = configparser.ConfigParser()
         self.config_path = os.path.join(get_config('SETTINGS_DIR'), self.filename)
 
     def execute(self):
-        if self.config_name == 'REQUESTS_DIR':
-            self.__update_requests_directory()
-        elif self.config_name == 'RESPONSES_DIR':
-            self.__update_responses_directory()
-        elif self.config_name == 'NUMBER_RESPONSES_RETAINED':
+        if self.config_name == ConfigName.NUMBER_RESPONSES_RETAINED.value:
             self.__update_number_responses()
-        elif self.config_name == 'SUPPRESS_OUTPUT':
+        elif self.config_name == ConfigName.REQUESTS_DIR.value:
+            self.__update_requests_directory()
+        elif self.config_name == ConfigName.RESPONSES_DIR.value:
+            self.__update_responses_directory()
+        elif self.config_name == ConfigName.SUPPRESS_OUTPUT.value:
             self.__update_suppress_output()
         else:
             return

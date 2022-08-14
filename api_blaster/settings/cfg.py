@@ -1,6 +1,6 @@
 import configparser, os
 
-from api_blaster.settings.config_file_map import config_map
+from api_blaster.settings.config_file_map import ConfigFileName
 
 # global dict for configs/settings in the form of SETTING_NAME:VALUE
 app_configs = {}
@@ -16,8 +16,8 @@ def initialize_configs(root_dir: str):
 
 def __load_config_files():
     config = configparser.ConfigParser()
-    for config_name, filename in config_map.items():
-        __load_config(config, config_name, filename)
+    for cfg in ConfigFileName:
+        __load_config(config, cfg.name, cfg.value)
 
 
 def __load_config(config_parser, config_name: str, config_filename: str):

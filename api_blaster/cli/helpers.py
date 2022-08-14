@@ -1,19 +1,21 @@
+from enum import Enum, unique
 from typing import List
 
 from api_blaster.cli.commands.command import Command
 
 
 #  https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
-class CLI_COLORS:
-    CRITICAL = '\33[91m'  # red
+@unique
+class CLI_COLORS(Enum):
+    BLUE = '\33[34m'
     END = '\033[0m'
-    REQUEST = '\33[32m' # Green
-    INFO = '\33[34m'  # Blue
-    WARNING = '\33[33m'  # yellow
+    GREEN = '\33[32m'
+    RED = '\33[91m'
+    YELLOW = '\33[33m'
 
 
 def apply_info_style(message: str) -> str:
-    return f"{CLI_COLORS.INFO}{message}{CLI_COLORS.END}"
+    return f"{CLI_COLORS['BLUE'].value}{message}{CLI_COLORS['END'].value}"
 
 
 def info(message: str):
@@ -21,7 +23,7 @@ def info(message: str):
 
 
 def apply_critical_style(message: str) -> str:
-    return f"{CLI_COLORS.CRITICAL}{message}{CLI_COLORS.END}"
+    return f"{CLI_COLORS['RED'].value}{message}{CLI_COLORS['END'].value}"
 
 
 def critical(message: str):
@@ -29,11 +31,11 @@ def critical(message: str):
 
 
 def apply_warn_style(message: str) -> str:
-    return f"{CLI_COLORS.WARNING}{message}{CLI_COLORS.END}"
+    return f"{CLI_COLORS['YELLOW'].value}{message}{CLI_COLORS['END'].value}"
 
 
 def warn(message: str):
-    message = f'WARNING: {message}'
+    message = f'YELLOW: {message}'
     print(f'{apply_warn_style(message)}', end="\n")
 
 
@@ -42,7 +44,7 @@ def alert(message: str):
 
 
 def apply_request_style(message: str) -> str:
-    return f"{CLI_COLORS.REQUEST}{message}{CLI_COLORS.END}"
+    return f"{CLI_COLORS['GREEN'].value}{message}{CLI_COLORS['END'].value}"
 
 
 def style_menu_items(items: List[Command]):

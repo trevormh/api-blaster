@@ -5,6 +5,7 @@ from prompt_toolkit.completion import WordCompleter
 from api_blaster.settings.cfg import get_config
 from api_blaster.cli.menu_builder import MenuBuilder
 from api_blaster.cli.helpers import info, style_menu_items
+from api_blaster.exit_codes import ExitCodes
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -69,6 +70,7 @@ class CLI:
 def main():
     menu = MenuBuilder(get_config('REQUESTS_DIR'))
     cli = CLI(menu)
+    code = ExitCodes.SUCCESS.value
     while True:
         try:
             commands, display_text = cli.menu_items()
@@ -76,13 +78,22 @@ def main():
             display_text.extend(cli.hidden_cmds)
             selection = prompt('> ', completer=WordCompleter(display_text))
             cli.handle_execute_command(selection)
-        except (FileNotFoundError, NameError, IOError) as err:
+        except (NameError, IOError) as err:
             from api_blaster.cli.helpers import critical
             critical(f"Failed to execute request.\n{err.args[0]}")
+            code = ExitCodes.GENERAL_ERROR.value
+            break
+        except FileNotFoundError as err:
+            from api_blaster.cli.helpers import critical
+            print('file not found')  # TODO remove
+            critical(err.args[0])
+            code = ExitCodes.FILE_OR_DIR_NOT_FOUND.value
             break
         except (KeyboardInterrupt, EOFError):
             break  # Control-C or Control-D pressed
         except Exception as err:
             from api_blaster.cli.helpers import critical
             critical(f"Failed to execute request.\n{err.args[0]}")
+            code = ExitCodes.GENERAL_ERROR.value
             break
+    return code

@@ -1,14 +1,9 @@
 import os
-from api_blaster.settings.cfg import initialize_configs
-
+import sys
 ROOT_DIR = os.path.abspath(os.curdir)
 
-
-def main():
+if __name__ == '__main__':  # pragma: nocover
+    from api_blaster.settings.cfg import initialize_configs
     initialize_configs(ROOT_DIR)
     from api_blaster.cli.cli import main
-    main()
-
-
-if __name__ == '__main__':  # pragma: nocover
-    main()
+    sys.exit(main())

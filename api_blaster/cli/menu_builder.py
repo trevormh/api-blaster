@@ -4,7 +4,7 @@ from typing import List, TYPE_CHECKING, Union
 
 from api_blaster.cli.commands.settings_command import SettingsCommand
 from api_blaster.cli.helpers import critical
-from api_blaster.settings.config_file_map import config_file_map
+# from api_blaster.settings.config_file_map import config_file_map
 
 if TYPE_CHECKING:
     from api_blaster.cli.commands.command import Command
