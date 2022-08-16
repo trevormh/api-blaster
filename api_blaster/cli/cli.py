@@ -1,4 +1,6 @@
 import cmd
+import traceback # Todo - remove
+
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
@@ -80,6 +82,7 @@ def main():
             cli.handle_execute_command(selection)
         except (NameError, IOError) as err:
             from api_blaster.cli.helpers import critical
+            traceback.print_stack()  # Todo remove after testing
             critical(f"Failed to execute request.\n{err.args[0]}")
             code = ExitCodes.GENERAL_ERROR.value
             break
@@ -93,6 +96,7 @@ def main():
             break  # Control-C or Control-D pressed
         except Exception as err:
             from api_blaster.cli.helpers import critical
+            traceback.print_stack()  # Todo remove after testing
             critical(f"Failed to execute request.\n{err.args[0]}")
             code = ExitCodes.GENERAL_ERROR.value
             break

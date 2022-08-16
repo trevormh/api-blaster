@@ -29,6 +29,8 @@ class SettingsCommand(Command):
             self.__update_responses_directory()
         elif self.config_name == ConfigName.SUPPRESS_OUTPUT.value:
             self.__update_suppress_output()
+        elif self.config_name == ConfigName.SERVER_STARTUP.value:
+            self.__update_server_startup()
         else:
             return
 
@@ -74,7 +76,7 @@ class SettingsCommand(Command):
                 self.__update_number_responses()
 
     def __update_suppress_output(self):
-        info(f'Current suppress output value: {get_config(self.config_name)}')
+        info(f'Current suppress output value: {bool(get_config(self.config_name))}')
         info(f'About: {get_config_info(self.config_name)}')
         suppress = input('Suppress output? (True or False): ').capitalize()
         if suppress in ['True', 'False']:
@@ -85,3 +87,16 @@ class SettingsCommand(Command):
         elif suppress != '':
             alert(f"{suppress} is not a valid selection. Please choose True or False")
             self.__update_suppress_output()
+
+    def __update_server_startup(self):
+        info(f'Current server startup value: {bool(get_config(self.config_name))}')
+        info(f'About: {get_config_info(self.config_name)}')
+        startup = input('Start server when API blaster starts? (True or False): ').capitalize()
+        if startup in ['True', 'False']:
+            if update_config(self.config_path, self.config_name, value=startup):
+                alert('Server startup updated successfully')
+            else:
+                alert(f'Failed to update config {self.config_name}')
+        elif startup != '':
+            alert(f"{startup} is not a valid selection. Please choose True or False")
+            self.__update_server_startup()

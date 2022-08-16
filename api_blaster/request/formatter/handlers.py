@@ -36,7 +36,7 @@ class AuthHandler(Handler):
 
 class SuppressOutputHandler(Handler):
     def next(self, request: Any, request_params: List[str]) -> list[str]:
-        if strtobool(get_config('SUPPRESS_OUTPUT')):
+        if get_config('SUPPRESS_OUTPUT'):
             request_params.append("--quiet")
             print('Output Suppressed')
         else:

@@ -1,4 +1,5 @@
 import configparser, os
+from distutils.util import strtobool
 
 from api_blaster.settings.config_file_map import ConfigFileName
 
@@ -39,6 +40,10 @@ def __load_config(config_parser, config_name: str, config_filename: str):
 # sets config name and config value in the global app_configs dictionary
 def set_app_config(config_name: str, value: any):
     try:
+        # print(config_name, value)
+        # config values are strings, "cast" to bool when encountered
+        if value in ['True', 'False']:
+            value = strtobool(value)
         app_configs[config_name] = value
         return True
     except Exception as e:

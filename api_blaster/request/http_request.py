@@ -18,6 +18,7 @@ class HttpRequest(Command):
         return json.dumps(attrs)
 
     def execute(self):
+        # breakpoint()
         cmd = Formatter(self).format()
         httpie.core.main(cmd)  # TODO, implement check to see if reload is needed for when suppress setting was changed from quiet to all
         reload(httpie.core)
