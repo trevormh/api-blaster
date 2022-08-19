@@ -10,7 +10,13 @@ from api_blaster.settings.cfg import get_config
 
 class ProtocolHandler(Handler):
     def next(self, request: Any, request_params: List[str]) -> list[str]:
-        request_params.append("http")
+        request_params.append("https")  # TODO make this dynamic based on request
+        return super().next(request, request_params)
+
+
+class FollowRedirects(Handler):
+    def next(self, request: Any, request_params: List[str]) -> list[str]:
+        request_params.append("--follow")  # TODO read this from settings
         return super().next(request, request_params)
 
 
@@ -52,10 +58,14 @@ class SaveResponseHandler(Handler):
 
     def next(self, request: Any, request_params: List[str]) -> list[str]:
         if self.max_num_responses > 0:
-            response_name = os.path.join(self.responses_dir, f'{time.time()}_{request.name}.txt')
+            response_name = f'{time.time()}_{request.name}.txt'
+            response_path = os.path.join(self.responses_dir, response_name)
+            request_params.append('--pretty=none')
             request_params.append('--output')
-            request_params.append(response_name)
-            print(f'Output saved to: {response_name}')
+            request_params.append(response_path)
+            # print(f'Output saved to: {response_path}')
+            url = f'http://localhost:8000/response/{response_name}'  # TODO get host and port from settings
+            print(f'View response: {url}')
             self.__handle_old_files()
         return super().next(request, request_params)
 

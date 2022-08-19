@@ -14,6 +14,7 @@ class Formatter:
 
     def _set_handlers(self) -> Handler:
         protocol = handlers.ProtocolHandler()
+        follow_redirects = handlers.FollowRedirects()
         auth = handlers.AuthHandler()
         form = handlers.FormHandler()
         method = handlers.MethodHandler()
@@ -22,6 +23,7 @@ class Formatter:
         save_response = handlers.SaveResponseHandler()
 
         protocol \
+            .set_next(follow_redirects) \
             .set_next(auth) \
             .set_next(form) \
             .set_next(method) \
