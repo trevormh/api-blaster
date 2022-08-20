@@ -4,16 +4,20 @@ from urllib.parse import urlsplit, urlunsplit
 from api_blaster.cli.commands.command import Command
 from api_blaster.request.formatter.formatter import Formatter
 import json
-# from httpie.core import main as httpie_main  # type: ignore
+from pymitter import EventEmitter
 import httpie.core
 from importlib import reload
 
 
 class HttpRequest(Command):
 
+    event = EventEmitter()
+
     def __init__(self):
         self.url = ''
         self.headers = {}
+        self.response_file = ''
+        self.reload_httpie = False
 
     def __repr__(self):
         attrs = {}
@@ -27,13 +31,29 @@ class HttpRequest(Command):
         # breakpoint()
         httpie.core.main(cmd)  # TODO, implement check to see if reload is needed for when suppress setting was changed from quiet to all
         reload(httpie.core)
-        cleanup_response("/Users/trevorholloway/software_dev/api_blaster_responses/1660790142.976898_google-get.txt", "https://www.google.com/")
+        cleanup_response(self.response_file, self.url)
+        response_name = self.response_file.rpartition("/")[2]
+        url = f'http://localhost:8000/response/{response_name}'  # TODO get host and port from settings
+        print(f'View response: {url}')  # TODO - make this less sloppy
+
+    @event.on("set_response_filepath")
+    def set_response_filepath(self, filepath):
+        self.response_file = filepath
+
+    # TODO - implement!
+    @event.on("reload_httpie")
+    def reload_httpie(self):
+        print("Reload Httpie")
+        self.reload_httpie = True
 
 
 def cleanup_response(response_file: str,  url: str):
+    if not response_file or not os.path.isfile(response_file):
+        print(f"invalid response file provided: {response_file}")
     url = get_base_url(url)
     tmp_file = create_tmp_response_file(response_file, url)
     update_response_file(response_file, tmp_file)
+    os.remove(tmp_file)
 
 
 def get_base_url(url: str):

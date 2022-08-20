@@ -1,6 +1,5 @@
 import os
 
-
 def start_server(response_dir):
     if not os.path.isdir(response_dir):
         print(f'Flask server was not started. Invalid response directory provided: {response_dir}')
@@ -26,5 +25,5 @@ if __name__ == '__main__':  # pragma: nocover
         server_thread = threading.Thread(target=start_server, args=(response_dir,), daemon=True)
         server_thread.start()
 
-    from api_blaster.cli.cli import main
-    sys.exit(main())
+    import api_blaster.cli.cli as cli
+    sys.exit(cli.main())

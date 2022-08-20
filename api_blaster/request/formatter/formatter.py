@@ -1,6 +1,7 @@
 from api_blaster.request.formatter.handler import Handler
 import api_blaster.request.formatter.handlers as handlers
 from typing import TYPE_CHECKING, List
+from pymitter import EventEmitter
 
 if TYPE_CHECKING:
     from api_blaster.request.http_request import HttpRequest
@@ -20,7 +21,7 @@ class Formatter:
         method = handlers.MethodHandler()
         url = handlers.URLHandler()
         suppress = handlers.SuppressOutputHandler()
-        save_response = handlers.SaveResponseHandler()
+        save_response = handlers.SaveResponseHandler(self.request)
 
         protocol \
             .set_next(follow_redirects) \

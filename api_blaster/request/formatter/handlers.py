@@ -6,7 +6,7 @@ from typing import Any, List, Union
 
 from api_blaster.request.formatter.handler import Handler
 from api_blaster.settings.cfg import get_config
-
+from pymitter import EventEmitter
 
 class ProtocolHandler(Handler):
     def next(self, request: Any, request_params: List[str]) -> list[str]:
@@ -52,9 +52,11 @@ class SuppressOutputHandler(Handler):
 
 class SaveResponseHandler(Handler):
 
-    def __init__(self):
+    def __init__(self, request):
         self.max_num_responses = int(get_config('NUMBER_RESPONSES_RETAINED'))
         self.responses_dir = get_config('RESPONSES_DIR')
+        self.request = request
+        # self.event = event
 
     def next(self, request: Any, request_params: List[str]) -> list[str]:
         if self.max_num_responses > 0:
@@ -63,9 +65,7 @@ class SaveResponseHandler(Handler):
             request_params.append('--pretty=none')
             request_params.append('--output')
             request_params.append(response_path)
-            # print(f'Output saved to: {response_path}')
-            url = f'http://localhost:8000/response/{response_name}'  # TODO get host and port from settings
-            print(f'View response: {url}')
+            self.request.event.emit("set_response_filepath", self.request, response_path)
             self.__handle_old_files()
         return super().next(request, request_params)
 
