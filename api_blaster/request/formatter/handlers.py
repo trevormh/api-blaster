@@ -3,10 +3,8 @@ import time
 from distutils.util import strtobool
 from glob import glob
 from typing import Any, List, Union
-
 from api_blaster.request.formatter.handler import Handler
 from api_blaster.settings.cfg import get_config
-from pymitter import EventEmitter
 
 class ProtocolHandler(Handler):
     def next(self, request: Any, request_params: List[str]) -> list[str]:
@@ -56,7 +54,6 @@ class SaveResponseHandler(Handler):
         self.max_num_responses = int(get_config('NUMBER_RESPONSES_RETAINED'))
         self.responses_dir = get_config('RESPONSES_DIR')
         self.request = request
-        # self.event = event
 
     def next(self, request: Any, request_params: List[str]) -> list[str]:
         if self.max_num_responses > 0:

@@ -1,12 +1,12 @@
 import os
-import sys
-
 from api_blaster.cli.commands.command import Command
+from api_blaster.event import event
 import configparser
 from typing import TYPE_CHECKING
-from api_blaster.settings.cfg import set_app_config, get_config, update_config, get_config_info
-from api_blaster.cli.helpers import info, critical, alert
+from api_blaster.settings.cfg import get_config, update_config, get_config_info
+from api_blaster.cli.helpers import info, alert
 from api_blaster.settings.config_file_map import ConfigFileName, ConfigName
+
 
 if TYPE_CHECKING:
     pass
@@ -81,6 +81,7 @@ class SettingsCommand(Command):
         suppress = input('Suppress output? (True or False): ').capitalize()
         if suppress in ['True', 'False']:
             if update_config(self.config_path, self.config_name, value=suppress):
+                event.emit("reload_httpie")
                 alert('Suppress output setting updated successfully')
             else:
                 alert(f'Failed to update config {self.config_name}')

@@ -1,7 +1,7 @@
 from api_blaster.request.formatter.handler import Handler
 import api_blaster.request.formatter.handlers as handlers
 from typing import TYPE_CHECKING, List
-from pymitter import EventEmitter
+
 
 if TYPE_CHECKING:
     from api_blaster.request.http_request import HttpRequest
