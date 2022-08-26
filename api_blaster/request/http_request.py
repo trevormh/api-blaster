@@ -25,10 +25,11 @@ class HttpRequest(Command):
         make_request(cmd)
         cleanup_response(self.response_file, self.url)
         response_name = self.response_file.rpartition("/")[2]
-        url = f'http://localhost:8000/response/{response_name}'  # TODO get host and port from settings
-        print(f'View response: {url}')  # TODO - make this less sloppy
+        url = f'http://localhost:8000/most_recent/{response_name}'  # TODO get host and port from settings
+        print(f'View most recent: {url}')  # TODO - make this less sloppy
+        url = f'http://localhost:8000/response_by_filename/{response_name}'
+        print(f'View response by filename: {url}')  # TODO - make this less sloppy
 
     @event.on("set_response_filepath")
     def set_response_filepath(self, filepath):
-        print("set_response_filepath called")
         self.response_file = filepath

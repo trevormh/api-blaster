@@ -57,7 +57,7 @@ class SaveResponseHandler(Handler):
 
     def next(self, request: Any, request_params: List[str]) -> list[str]:
         if self.max_num_responses > 0:
-            response_name = f'{time.time()}_{request.name}.txt'
+            response_name = f'{time.time()}_request={request.name}.txt'
             response_path = os.path.join(self.responses_dir, response_name)
             request_params.append('--pretty=none')
             request_params.append('--output')
