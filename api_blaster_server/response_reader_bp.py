@@ -28,7 +28,7 @@ def response_by_name(filename):
 
 def get_most_recent(request_name):
     from pathlib import Path
-    pattern = rf'*request={request_name}'
+    pattern = f'*request={request_name}'
     path_dir = Path(responses_dir)
     try:
         latest = max(path_dir.glob(pattern), key=os.path.getctime)

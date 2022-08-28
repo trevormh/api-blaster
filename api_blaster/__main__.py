@@ -1,12 +1,19 @@
 import os
 
+
+# def start_server(response_dir):
+#     if not os.path.isdir(response_dir):
+#         print(f'Flask server was not started. Invalid response directory provided: {response_dir}')
+#         return
+#     from api_blaster_server.main import create_app
+#     app = create_app(response_dir)
+#     app.run(host='0.0.0.0', port=8000)
+
 def start_server(response_dir):
-    if not os.path.isdir(response_dir):
-        print(f'Flask server was not started. Invalid response directory provided: {response_dir}')
-        return
-    from api_blaster_server.main import create_app
-    app = create_app(response_dir)
-    app.run(host='0.0.0.0', port=8000)
+    import asyncio
+    from api_blaster_server.main import main
+    asyncio.run(main(response_dir))
+
 
 
 if __name__ == '__main__':  # pragma: nocover

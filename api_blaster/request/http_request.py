@@ -2,7 +2,8 @@ from api_blaster.cli.commands.command import Command
 from api_blaster.request.cleanup import cleanup_response
 from api_blaster.request.formatter.formatter import Formatter
 import json
-from api_blaster.request.make_request import event, make_request
+from api_blaster.request.make_request import make_request
+from api_blaster.event import event
 
 
 class HttpRequest(Command):
@@ -25,6 +26,7 @@ class HttpRequest(Command):
         make_request(cmd)
         cleanup_response(self.response_file, self.url)
         response_name = self.response_file.rpartition("/")[2]
+        self.event.emit("request_completed")
         url = f'http://localhost:8000/most_recent/{response_name}'  # TODO get host and port from settings
         print(f'View most recent: {url}')  # TODO - make this less sloppy
         url = f'http://localhost:8000/response_by_filename/{response_name}'
