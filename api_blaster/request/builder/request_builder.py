@@ -62,6 +62,7 @@ class RequestBuilder(AbstractBuilder):
             raise FileNotFoundError(f"Request contains env variables, but no .env file was found in this directory: {self.path}")
         self.request.url = url
 
+
     def set_headers(self):
         if 'headers' in self.request_config:
             self.request.headers = {}

@@ -1,4 +1,6 @@
 import asyncio
+import json
+import random
 from typing import Optional, Awaitable
 
 import tornado.escape
@@ -69,9 +71,12 @@ class MostRecentHandler(tornado.web.RequestHandler):
 
     def get(self):
         path = self.request.path
-        if filename := self.get_filename(path):
-            # self.write(dict(should_refresh='false', filename=filename))
-            self.render("render.html", should_refresh='false', filename=filename)
+        filename, extension = self.get_most_recent_filename(path)
+        if filename:
+            if extension == ".json":
+                self.render("render_json.html", should_refresh='false', filename=filename)
+            else:
+                self.render("render.html", should_refresh='false', filename=filename)
 
 
     async def post(self):
@@ -89,20 +94,27 @@ class MostRecentHandler(tornado.web.RequestHandler):
         refresh = 'true' if refresh else 'false'
         self.write(dict(should_refresh=refresh))
 
-    def get_filename(self, file_path: str):
+    # Saved response filenames all have the request name as part of the filename
+    # in the form of /path/to/timestamp_request=request-name.extension
+    # Ex /home/responses/1662087575.251782_request=test1-get.json
+    def get_most_recent_filename(self, file_path: str):
         if file_path:
             from pathlib import Path
             try:
-                filename = file_path.rpartition("/")
-                request_name = filename[2].split("request=")
+                p = Path(file_path)
+                filename = p.name
+                # print(f'filename: {filename}')
+                # split at "request=" to get the request name
+                request_name = filename.split("request=")
                 pattern = f'*request={request_name[1]}'
                 path_dir = Path(responses_dir)
+                # search the responses directory for the most recently created file
+                # having the request_name
                 latest = max(path_dir.glob(pattern), key=os.path.getctime)
-
-                filename = str(latest).rpartition("/")
-                return filename[2]
-            except:
-                print('here')
+                latest_path = Path(latest)
+                return latest_path.name, latest_path.suffix
+            except Exception as e:
+                print(e)
                 return False
         else:
             return False
@@ -145,6 +157,58 @@ def file_exists(filename):
         return True
     return False
 
+
+class RenderJsonHandler(tornado.web.RequestHandler):
+
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
+    def get(self):
+        self.render("render_json.html")
+
+
+
+class ContentHandler(tornado.web.RequestHandler):
+
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
+    def get(self):
+        path = self.request.path
+        if path:
+            from pathlib import Path
+            try:
+                p = Path(path)
+                filename = p.name
+                file = get_file(filename)
+                self.write(file)
+            except Exception as e:
+                self.write(f'No requests found for {path}')
+        else:
+            self.write('No file specified in URL')
+
+
+class TestHandler(tornado.web.RequestHandler):
+
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
+    def get(self):
+        data = {}
+        for i in range(random.randrange(1, 10)):
+            words = ['testing', 'abc', 'test2', 'another_word','cdef','jkl']
+            key = words[random.randrange(0,5)]
+            value = words[random.randrange(0,5)]
+            data[f'{key}_{i}'] = f'{value}_{i}'
+            # randomly add some lists too
+            if random.randrange(0,2):
+                data[f'{key}_{i}_{i}'] = []
+                for j in range(random.randrange(1, 10)):
+                    data[f'{key}_{i}_{i}'].append(f'{value}_{j}_{i}')
+        self.write(dict(data))  # using dict sets content type to application/json
+        # self.render("render_json.html", data=json.dumps(data))
+
+
 async def main(dir):
     import logging
     hn = logging.NullHandler()
@@ -160,10 +224,12 @@ async def main(dir):
     parse_command_line()
     app = tornado.web.Application(
         [
-            # (r"/", MainHandler),
+            (r"/test", TestHandler),
+            (r"/render_json", RenderJsonHandler),
             (r"/refesh", RefreshHandler),
             (r"/most_recent/.*", MostRecentHandler),
-            (r"/render_most_recent/.*", RenderMostRecentHandler)
+            (r"/render_most_recent/.*", RenderMostRecentHandler),
+            (r"/content/.*", ContentHandler),
         ],
         cookie_secret="__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
         template_path=os.path.join(os.path.dirname(__file__), "templates"),

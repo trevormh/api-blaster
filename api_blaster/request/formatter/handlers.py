@@ -59,7 +59,8 @@ class SaveResponseHandler(Handler):
         if self.max_num_responses > 0:
             response_name = f'{time.time()}_request={request.name}.txt'
             response_path = os.path.join(self.responses_dir, response_name)
-            request_params.append('--pretty=none')
+            request_params.append('--pretty=none')  # don't print color, encodings will be saved in response file
+            request_params.append('--print=hb')  # print both response headers and body
             request_params.append('--output')
             request_params.append(response_path)
             self.request.event.emit("set_response_filepath", self.request, response_path)

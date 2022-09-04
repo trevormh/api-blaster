@@ -1,5 +1,5 @@
 from api_blaster.cli.commands.command import Command
-from api_blaster.request.cleanup import cleanup_response
+from api_blaster.request.cleanup import extract_response_body_and_meta
 from api_blaster.request.formatter.formatter import Formatter
 import json
 from api_blaster.request.make_request import make_request
@@ -24,12 +24,11 @@ class HttpRequest(Command):
     def execute(self):
         cmd = Formatter(self).format()
         make_request(cmd)
-        cleanup_response(self.response_file, self.url)
-        response_name = self.response_file.rpartition("/")[2]
+        response_name = extract_response_body_and_meta(self.response_file, self.url)
         self.event.emit("request_completed")
-        url = f'http://localhost:8000/most_recent/{response_name}'  # TODO get host and port from settings
+        url = f'http://localhost:8888/most_recent/{response_name}'  # TODO get host and port from settings
         print(f'View most recent: {url}')  # TODO - make this less sloppy
-        url = f'http://localhost:8000/response_by_filename/{response_name}'
+        url = f'http://localhost:8888/response_by_filename/{response_name}'
         print(f'View response by filename: {url}')  # TODO - make this less sloppy
 
     @event.on("set_response_filepath")
