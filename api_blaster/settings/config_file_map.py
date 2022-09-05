@@ -13,6 +13,7 @@ class ConfigName(Enum):
     SERVER_STARTUP = 'SERVER_STARTUP'
     SETTINGS_DIR = 'SETTINGS_DIR'
     SUPPRESS_OUTPUT = 'SUPPRESS_OUTPUT'
+    PORT_NUMBER = 'PORT_NUMBER'
 
 
 @unique
@@ -22,3 +23,4 @@ class ConfigFileName(Enum):
     RESPONSES_DIR = 'responses_directory.ini'
     SERVER_STARTUP = 'server_startup.ini'
     SUPPRESS_OUTPUT = 'suppress_output.ini'
+    PORT_NUMBER = 'port_number.ini'

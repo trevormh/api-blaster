@@ -4,6 +4,8 @@ from api_blaster.request.formatter.formatter import Formatter
 import json
 from api_blaster.request.make_request import make_request
 from api_blaster.event import event
+from api_blaster.settings.cfg import get_config
+from api_blaster.settings.config_file_map import ConfigName
 
 
 class HttpRequest(Command):
@@ -26,9 +28,10 @@ class HttpRequest(Command):
         make_request(cmd)
         response_name = extract_response_body_and_meta(self.response_file, self.url)
         self.event.emit("request_completed")
-        url = f'http://localhost:8888/most_recent/{response_name}'  # TODO get host and port from settings
+        port_number = get_config(ConfigName.PORT_NUMBER.value)
+        url = f'http://localhost:{port_number}/most_recent/{response_name}'  # TODO get host and port from settings
         print(f'View most recent: {url}')  # TODO - make this less sloppy
-        url = f'http://localhost:8888/response_by_filename/{response_name}'
+        url = f'http://localhost:{port_number}/response_by_filename/{response_name}'
         print(f'View response by filename: {url}')  # TODO - make this less sloppy
 
     @event.on("set_response_filepath")

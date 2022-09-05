@@ -1,4 +1,6 @@
 import os
+
+from api_blaster.__main__ import is_port_available
 from api_blaster.cli.commands.command import Command
 from api_blaster.event import event
 import configparser
@@ -31,6 +33,8 @@ class SettingsCommand(Command):
             self.__update_suppress_output()
         elif self.config_name == ConfigName.SERVER_STARTUP.value:
             self.__update_server_startup()
+        elif self.config_name == ConfigName.PORT_NUMBER.value:
+            self.__update_port_number()
         else:
             return
 
@@ -101,3 +105,21 @@ class SettingsCommand(Command):
         elif startup != '':
             alert(f"{startup} is not a valid selection. Please choose True or False")
             self.__update_server_startup()
+
+    def __update_port_number(self):
+        info(f'Current port number: {get_config(self.config_name)}')
+        port_number = input('Port number: ')
+        if port_number.isdigit():
+            if is_port_available(int(port_number)):
+                if update_config(self.config_path, self.config_name, value=port_number):
+                    alert('Port number updated successfully')
+                    # TODO - event emit port changed. restart server with new port num
+                    # event.emit("port_number_changed")
+                else:
+                    alert(f'Failed to update config {self.config_name}')
+            else:
+                alert(f"{port_number} is currently in use. Please choose a different port number")
+                self.__update_port_number()
+        elif port_number != '':
+            alert(f"{port_number} is not a valid selection. Please choose a number.")
+            self.__update_port_number()

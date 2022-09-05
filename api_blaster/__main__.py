@@ -1,19 +1,16 @@
 import os
 
 
-# def start_server(response_dir):
-#     if not os.path.isdir(response_dir):
-#         print(f'Flask server was not started. Invalid response directory provided: {response_dir}')
-#         return
-#     from api_blaster_server.main import create_app
-#     app = create_app(response_dir)
-#     app.run(host='0.0.0.0', port=8000)
-
-def start_server(response_dir):
+def start_server(response_dir: str, port_number: int):
     import asyncio
     from api_blaster_server.main import main
-    asyncio.run(main(response_dir))
+    asyncio.run(main(response_dir, port_number))
 
+
+def is_port_available(port_number: int) -> bool:
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port_number)) != 0
 
 
 if __name__ == '__main__':  # pragma: nocover
@@ -29,8 +26,12 @@ if __name__ == '__main__':  # pragma: nocover
     if get_config(ConfigName.SERVER_STARTUP.value):
         import threading
         response_dir = get_config(ConfigName.RESPONSES_DIR.value)
-        server_thread = threading.Thread(target=start_server, args=(response_dir,), daemon=True)
-        server_thread.start()
+        port_number = int(get_config(ConfigName.PORT_NUMBER.value))
+        if is_port_available(port_number):
+            server_thread = threading.Thread(target=start_server, args=(response_dir, port_number), daemon=True)
+            server_thread.start()
+        else:
+            print(f'Server not started, port {port_number} is already in use. Change port number in settings to use server.')
 
     import api_blaster.cli.cli as cli
     sys.exit(cli.main())

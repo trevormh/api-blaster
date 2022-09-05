@@ -1,9 +1,9 @@
 import cmd
 import traceback # Todo - remove
 
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import WordCompleter
 
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit import PromptSession
 from api_blaster.settings.cfg import get_config
 from api_blaster.cli.menu_builder import MenuBuilder
 from api_blaster.cli.helpers import info, style_menu_items
@@ -23,6 +23,7 @@ class CLI:
         self.menu = menu
         self.items = []
         self.cmd = cmd.Cmd()
+
 
     def get_commands(self):
         return self.menu.get_items()
@@ -73,12 +74,13 @@ def main():
     menu = MenuBuilder(get_config('REQUESTS_DIR'))
     cli = CLI(menu)
     code = ExitCodes.SUCCESS.value
+    session = PromptSession()
     while True:
         try:
             commands, display_text = cli.menu_items()
             cli.print_menu(commands)
             display_text.extend(cli.hidden_cmds)
-            selection = prompt('> ', completer=WordCompleter(display_text))
+            selection = session.prompt('> ', completer=WordCompleter(display_text))
             cli.handle_execute_command(selection)
         except (NameError, IOError) as err:
             from api_blaster.cli.helpers import critical
