@@ -1,4 +1,6 @@
 import asyncio
+import threading
+
 import tornado.escape
 import tornado.locks
 import tornado.web
@@ -6,11 +8,16 @@ import os.path
 
 from tornado.options import define, options, parse_command_line
 
+from api_blaster.event import event
+from api_blaster.settings.cfg import get_config
+from api_blaster.settings.config_file_map import ConfigName
 from api_blaster_server.request_handlers.content_handler import ContentHandler
 from api_blaster_server.request_handlers.most_recent_handler import MostRecentHandler
 from api_blaster_server.request_handlers.refresh_handler import RefreshHandler
 from api_blaster_server.request_handlers.test_handler import TestHandler
 
+shutdown_event = None
+server = None
 
 async def main(responses_dir: str, port_number: int):
     # TODO - better error handling
@@ -21,8 +28,8 @@ async def main(responses_dir: str, port_number: int):
         print('Port number not set - Cannot start server')
         return
 
-    define("port", default=port_number, help="run on the given port", type=int)
-    define("debug", default=True, help="run in debug mode")
+    # define("port", default=port_number, help="run on the given port", type=int)
+    # define("debug", default=True, help="run in debug mode")
 
     import logging
     hn = logging.NullHandler()
@@ -40,9 +47,45 @@ async def main(responses_dir: str, port_number: int):
             (r"/most_recent/.*", MostRecentHandler, dict(responses_dir=responses_dir)),
             (r"/content/.*", ContentHandler, dict(responses_dir=responses_dir)),
         ],
+        address="localhost",
+        port=port_number,
         template_path=os.path.join(os.path.dirname(__file__), "templates"),
-        static_path=os.path.join(os.path.dirname(__file__), "static"),
-        debug=options.debug,
+        static_path=os.path.join(os.path.dirname(__file__), "static")
     )
-    app.listen(options.port)
-    await asyncio.Event().wait()
+    global server
+    server = app.listen(port_number)
+    global shutdown_event
+    shutdown_event = asyncio.Event()
+    await shutdown_event.wait()
+
+
+def start_server(responses_dir: str, port_number: int):
+    asyncio.run(main(responses_dir, port_number))
+
+server_thread = None
+
+def setup(responses_dir: str, port_number: int):
+    global server_thread
+    server_thread = threading.Thread(target=start_server, args=(responses_dir, port_number), daemon=True)
+    server_thread.start()
+
+
+def stop_server():
+    print('stopping server')
+    try:
+        server.stop()
+        shutdown_event.set()
+        asyncio.run(server.close_all_connections())
+        global server_thread
+        server_thread.join()
+    except asyncio.exceptions.CancelledError as e:
+        pass
+    print('stopped')
+
+
+def restart_server():
+    print('restarting server')
+    stop_server()
+    response_dir = get_config(ConfigName.RESPONSES_DIR.value)
+    port_number = int(get_config(ConfigName.PORT_NUMBER.value))
+    setup(response_dir, port_number)

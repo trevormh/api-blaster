@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from api_blaster.settings.cfg import get_config, update_config, get_config_info
 from api_blaster.cli.helpers import info, alert
 from api_blaster.settings.config_file_map import ConfigFileName, ConfigName
-
+from api_blaster_server.main import restart_server
 
 if TYPE_CHECKING:
     pass
@@ -115,6 +115,10 @@ class SettingsCommand(Command):
                     alert('Port number updated successfully')
                     # TODO - event emit port changed. restart server with new port num
                     # event.emit("port_number_changed")
+                    try:
+                        restart_server()
+                    except Exception as e:
+                        print(e)
                 else:
                     alert(f'Failed to update config {self.config_name}')
             else:
