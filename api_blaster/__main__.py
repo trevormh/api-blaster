@@ -1,12 +1,6 @@
 import os
 
 
-# def start_server(response_dir: str, port_number: int):
-#     import asyncio
-#     from api_blaster_server.main import main
-#     asyncio.run(main(response_dir, port_number))
-#
-
 def is_port_available(port_number: int) -> bool:
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -28,7 +22,6 @@ if __name__ == '__main__':  # pragma: nocover
         response_dir = get_config(ConfigName.RESPONSES_DIR.value)
         port_number = int(get_config(ConfigName.PORT_NUMBER.value))
         if is_port_available(port_number):
-            # import asyncio
             from api_blaster_server.main import setup
             setup(response_dir, port_number)
         else:
