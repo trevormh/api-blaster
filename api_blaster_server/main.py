@@ -1,5 +1,6 @@
 import asyncio
 import threading
+from typing import Union
 
 import tornado.escape
 import tornado.locks
@@ -15,8 +16,9 @@ from api_blaster_server.request_handlers.most_recent_handler import MostRecentHa
 from api_blaster_server.request_handlers.refresh_handler import RefreshHandler
 from api_blaster_server.request_handlers.test_handler import TestHandler
 
-shutdown_event = None
-server = None
+shutdown_event: Union[asyncio.Event, None] = None
+server: Union[tornado.Application, None] = None
+
 
 async def main(responses_dir: str, port_number: int):
     # TODO - better error handling
@@ -64,7 +66,9 @@ async def main(responses_dir: str, port_number: int):
 def start_server(responses_dir: str, port_number: int):
     asyncio.run(main(responses_dir, port_number))
 
-server_thread = None
+
+server_thread: Union[threading.Thread, None] = None
+
 
 def setup(responses_dir: str, port_number: int):
     global server_thread
