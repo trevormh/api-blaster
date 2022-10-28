@@ -26,12 +26,12 @@ class HttpRequest(Command):
     def execute(self):
         cmd = Formatter(self).format()
         make_request(cmd)
-        response_name = extract_response_body_and_meta(self.response_file, self.url)
-        self.event.emit("request_completed")
+        request_name = extract_response_body_and_meta(self.response_file, self.url)
+        self.event.emit("request_completed", request_name)
         port_number = get_config(ConfigName.PORT_NUMBER.value)
-        url = f'http://localhost:{port_number}/most_recent/{response_name}'  # TODO get host and port from settings
+        url = f'http://localhost:{port_number}/most_recent/{request_name}'  # TODO get host and port from settings
         print(f'View most recent: {url}')  # TODO - make this less sloppy
-        url = f'http://localhost:{port_number}/response_by_filename/{response_name}'
+        url = f'http://localhost:{port_number}/response_by_filename/{request_name}'
         print(f'View response by filename: {url}')  # TODO - make this less sloppy
 
     @event.on("set_response_filepath")

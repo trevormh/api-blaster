@@ -47,9 +47,8 @@ var updater = {
     cursor: null,
 
     poll: function () {
-        console.log('poll called')
         $.ajax({url: "/refesh", type: "POST", dataType: "text",
-            data: {},
+            data: {name: filename},
             success: updater.onSuccess,
             error: updater.onError
         });
