@@ -34,7 +34,7 @@ async def main(responses_dir: str, port_number: int):
         options.port = port_number
     except AttributeError:
         define("port", default=port_number, help="run on the given port", type=int)
-        define("debug", default=True, help="run in debug mode")
+        define("debug", default=False, help="run in debug mode")
 
     import logging
     hn = logging.NullHandler()
@@ -55,7 +55,8 @@ async def main(responses_dir: str, port_number: int):
         template_path=os.path.join(os.path.dirname(__file__), "templates"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),
         debug=options.debug,
-        idle_connection_timeout=5
+        idle_connection_timeout=5,
+        autoreload=False
     )
     global server
     server = app.listen(options.port)
@@ -78,6 +79,7 @@ def setup(responses_dir: str, port_number: int):
 
 
 def stop_server():
+    print('stopping server')
     try:
         server.stop()
         shutdown_event.set()

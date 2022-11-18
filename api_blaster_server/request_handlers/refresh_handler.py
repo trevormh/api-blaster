@@ -2,6 +2,8 @@ import asyncio
 import tornado.escape
 import tornado.locks
 import tornado.web
+from tornado import ioloop
+
 from api_blaster.event import event
 
 
@@ -28,6 +30,19 @@ class FileUpdateCheck(object):
 file_check = FileUpdateCheck()
 
 
+
+def this_is_a_hack():
+    pass
+
+
+scheduler = ioloop.PeriodicCallback(this_is_a_hack, 500)
+
+
+def loop_check():
+    if not scheduler.is_running():
+        scheduler.start()
+
+
 @event.on("request_completed")
 def update_refresh_status(response_name: str) -> None:
     file_check.set_refresh_status(True, get_request_name(response_name))
@@ -43,6 +58,7 @@ def get_request_name(response_name: str) -> str:
 class RefreshHandler(tornado.web.RequestHandler):
 
     async def post(self) -> None:
+        loop_check()
         data = self.request.body_arguments
         response_name = data['name'][0].decode('utf-8')  # bytes to str
         name = get_request_name(response_name)

@@ -54,11 +54,16 @@ var updater = {
         });
     },
     onSuccess: function(response) {
-        console.log(`success ${JSON.stringify(response)}`)
-        location.reload();
+        response = JSON.parse(response)
+        console.log(`success ${response.should_refresh}`)
+        if (response.should_refresh) {
+            location.reload();
+        }
     },
     onError: function(response) {
-        console.log(`success ${response}`)
+<!--        response = JSON.parse(response)-->
+<!--        console.log(`error ${response}`)-->
+        console.log('error')
         console.log(response)
     }
 }
