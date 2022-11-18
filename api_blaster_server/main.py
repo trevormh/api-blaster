@@ -54,8 +54,8 @@ async def main(responses_dir: str, port_number: int):
         ],
         template_path=os.path.join(os.path.dirname(__file__), "templates"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),
-        debug=options.debug,
         idle_connection_timeout=5,
+        debug=False,
         autoreload=False
     )
     global server
