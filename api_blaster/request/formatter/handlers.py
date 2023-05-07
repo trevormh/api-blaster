@@ -6,6 +6,7 @@ from typing import Any, List, Union
 from api_blaster.request.formatter.handler import Handler
 from api_blaster.settings.cfg import get_config
 
+
 class ProtocolHandler(Handler):
     def next(self, request: Any, request_params: List[str]) -> list[str]:
         request_params.append("https")  # TODO make this dynamic based on request
@@ -24,6 +25,29 @@ class AuthHandler(Handler):
             auth = self._auth_str(request)
             if auth:
                 request_params.extend(auth)
+        return super().next(request, request_params)
+
+    def _auth_str(self, request: Any) -> Union[List[str], None]:
+        auth = request.headers['Authorization'].rpartition(" ")
+        type = auth[0]
+        creds = auth[2]
+        if type.lower() == "basic":
+            return ["-a", creds]
+        elif type.lower() == "bearer":
+            return ["-A", "bearer", "-a", creds]
+        else:
+            return None
+
+
+class HeadersHandler(Handler):
+    def next(self, request: Any, request_params: List[str]) -> list[str]:
+        for key, val in request.headers.items():
+            if key.lower() == "authorization":
+                auth = self._auth_str(request)
+                if auth:
+                    request_params.extend(auth)
+            else:
+                request_params.extend([f'{key}:{val}'])
         return super().next(request, request_params)
 
     def _auth_str(self, request: Any) -> Union[List[str], None]:

@@ -51,6 +51,12 @@ class RequestBuilder(AbstractBuilder):
         return item
 
     def find_env_var(self, s: str) -> list:
+        """
+        Find if the provided string contains
+        any env vars. These will be wrapped in
+        double braces.
+        Ex: "{{PROTOCOL}}://{{BASE_URL}}:8000/test"
+        """
         return re.findall(r"{{(.*?)}}(?!})", s)
 
     def set_url(self):

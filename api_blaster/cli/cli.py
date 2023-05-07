@@ -70,7 +70,7 @@ class CLI:
                 warn(f"Item '{cmd}' not found")
 
 
-def main():
+def main() -> ExitCodes:
     menu = MenuBuilder(get_config('REQUESTS_DIR'))
     cli = CLI(menu)
     code = ExitCodes.SUCCESS.value

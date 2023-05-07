@@ -16,19 +16,19 @@ class Formatter:
     def _set_handlers(self) -> Handler:
         protocol = handlers.ProtocolHandler()
         follow_redirects = handlers.FollowRedirects()
-        auth = handlers.AuthHandler()
+        # auth = handlers.AuthHandler()
+        headers = handlers.HeadersHandler()
         form = handlers.FormHandler()
-        method = handlers.MethodHandler()
+        # method = handlers.MethodHandler()
         url = handlers.URLHandler()
         suppress = handlers.SuppressOutputHandler()
         save_response = handlers.SaveResponseHandler(self.request)
 
         protocol \
             .set_next(follow_redirects) \
-            .set_next(auth) \
-            .set_next(form) \
-            .set_next(method) \
             .set_next(url) \
+            .set_next(form) \
+            .set_next(headers) \
             .set_next(suppress) \
             .set_next(save_response)
 
