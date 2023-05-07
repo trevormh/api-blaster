@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from api_blaster.settings.cfg import get_config, update_config, get_config_info
 from api_blaster.cli.helpers import info, alert
 from api_blaster.settings.config_file_map import ConfigFileName, ConfigName
-from api_blaster_server.main import restart_server
+from api_blaster.server.main import restart_server
 
 if TYPE_CHECKING:
     pass

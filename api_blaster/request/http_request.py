@@ -6,7 +6,6 @@ from api_blaster.request.make_request import make_request
 from api_blaster.event import event
 from api_blaster.settings.cfg import get_config
 from api_blaster.settings.config_file_map import ConfigName
-from api_blaster_server.request_handlers.refresh_handler import update_refresh_status
 
 
 class HttpRequest(Command):

@@ -1,5 +1,0 @@
-{
-    "name": "Index - Get Request",
-    "method": "GET",
-    "url": "{{BASE_URL}}/"
-}

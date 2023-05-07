@@ -1,9 +1,0 @@
-{
-    "name": "Index - Get Request",
-    "url": "{{BASE_URL}}/some-endpoint?item={{TEST_PARAM}}",
-    "headers": {
-        "method": "GET",
-        "content-type": "application/json",
-        "Authorization": "Basic {{SITE_1_USERNAME}}:{{SITE_1_PASSWORD}}"
-    }
-}

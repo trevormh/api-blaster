@@ -1,7 +1,7 @@
 
 from typing import Optional, Awaitable
 import tornado.web
-from api_blaster_server.file_helpers import get_file
+from api_blaster.server.file_helpers import get_file
 
 
 class ContentHandler(tornado.web.RequestHandler):
