@@ -1,0 +1,8 @@
+{
+    "name": "Index - Get Request Bearer Auth",
+    "method": "GET",
+    "url": "{{PROTOCOL}}://{{BASE_URL}}:{{PORT}}/",
+    "headers": {
+        "Authentication": "bearer {{BEARER_TOKEN}}"
+    }
+}

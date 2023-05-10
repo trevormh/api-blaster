@@ -14,7 +14,7 @@ from api_blaster.cli.commands.request_command import RequestCommand
 
 
 class MenuBuilder:
-    exclude = ['.env', '.DS_Store', '__init__.py']
+    exclude = ['.env', '.DS_Store', '__init__.py', '__pycache__']
 
     def __init__(self, collections_dir):
         self.dir = collections_dir
@@ -22,6 +22,7 @@ class MenuBuilder:
         self.dot_env_path = None
         self._set_dot_env_path()
         self._set_commands()
+        self.requests_dir = get_config('REQUESTS_DIR')
 
     def set_dir(self, new_dir: str):
         self.dir = new_dir
@@ -40,7 +41,7 @@ class MenuBuilder:
 
     def nav_up(self):
         # don't allow backing out beyond the requests directory!
-        requests_dir = get_config('REQUESTS_DIR')
+        requests_dir = self.requests_dir
         if self.dir != requests_dir:
             self.set_dir(self.dir.rpartition("/")[0])
             # self._set_commands()

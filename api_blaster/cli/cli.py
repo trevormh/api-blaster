@@ -23,7 +23,8 @@ class CLI:
         self.menu = menu
         self.items = []
         self.cmd = cmd.Cmd()
-
+        self.settings_dir = get_config('SETTINGS_DIR')
+        self.requests_dir = get_config('REQUESTS_DIR')
 
     def get_commands(self):
         return self.menu.get_items()
@@ -43,16 +44,16 @@ class CLI:
 
     def handle_hidden_cmd(self, cmd: str):
         if cmd == 'cd ..':
-            if self.menu.get_dir() == get_config('SETTINGS_DIR'):
+            if self.menu.get_dir() == self.settings_dir:
                 # user was in settings menu and wants to exit, return to request directory
-                request_dir = get_config('REQUESTS_DIR')
+                request_dir = self.requests_dir
                 self.menu.set_dir(request_dir)
             else:
                 self.menu.nav_up()
         elif cmd == 'exit':
             raise KeyboardInterrupt
         elif cmd == "settings":
-            settings_dir = get_config('SETTINGS_DIR')
+            settings_dir = self.settings_dir
             self.menu.set_dir(settings_dir)
 
     def handle_execute_command(self, cmd: str):

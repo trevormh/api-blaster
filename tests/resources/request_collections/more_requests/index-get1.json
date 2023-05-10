@@ -1,0 +1,5 @@
+{
+    "name": "Index - Get Request",
+    "method": "GET",
+    "url": "{{PROTOCOL}}://{{BASE_URL}}:{{PORT}}/"
+}

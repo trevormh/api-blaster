@@ -1,4 +1,5 @@
 import configparser, os
+import sys
 from distutils.util import strtobool
 
 from api_blaster.settings.config_file_map import ConfigFileName
@@ -9,7 +10,9 @@ app_configs = {}
 app_configs_info = {}
 
 
-def initialize_configs(root_dir: str):
+def initialize_configs(root_dir: str = None):
+    if not root_dir:
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     app_configs['ROOT_DIR'] = root_dir
     app_configs['SETTINGS_DIR'] = os.path.join(root_dir, 'api_blaster', 'settings', 'configs')
     __load_config_files()
