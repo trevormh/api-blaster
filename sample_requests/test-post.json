@@ -1,0 +1,5 @@
+{
+    "name": "API Blaster Test - POST",
+    "method": "POST",
+    "url": "{{PROTOCOL}}://{{BASE_URL}}:{{PORT}}/api-blaster-post-test"
+}

@@ -9,6 +9,12 @@ class TestHandler(tornado.web.RequestHandler):
         pass
 
     def get(self):
+        self.write(self.content())
+
+    def post(self):
+        self.write(self.content())
+
+    def content(self):
         data = {}
         for i in range(random.randrange(1, 10)):
             words = ['testing', 'abc', 'test2', 'another_word', 'cdef', 'jkl']
@@ -20,5 +26,4 @@ class TestHandler(tornado.web.RequestHandler):
                 data[f'{key}_{i}_{i}'] = []
                 for j in range(random.randrange(1, 10)):
                     data[f'{key}_{i}_{i}'].append(f'{value}_{j}_{i}')
-        self.write(dict(data))  # using dict sets content type to application/json
-        # self.render("render_json.html", data=json.dumps(data))
+        return dict(data)  # using dict sets content type to application/json

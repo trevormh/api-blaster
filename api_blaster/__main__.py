@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 def is_port_available(port_number: int) -> bool:
@@ -7,9 +8,7 @@ def is_port_available(port_number: int) -> bool:
         return s.connect_ex(('localhost', port_number)) != 0
 
 
-if __name__ == '__main__':  # pragma: nocover
-    import sys
-
+def main():
     from api_blaster.settings.cfg import initialize_configs, get_config
     from api_blaster.settings.config_file_map import ConfigName
 
@@ -28,3 +27,7 @@ if __name__ == '__main__':  # pragma: nocover
 
     import api_blaster.cli.cli as cli
     sys.exit(cli.main())
+
+
+if __name__ == '__main__':  # pragma: nocover
+    sys.exit(main())

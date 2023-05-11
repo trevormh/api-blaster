@@ -9,13 +9,13 @@ import os.path
 
 from tornado.options import define, options, parse_command_line
 
+
 from api_blaster.settings.cfg import get_config
 from api_blaster.settings.config_file_map import ConfigName
 from api_blaster.server.request_handlers.content_handler import ContentHandler
 from api_blaster.server.request_handlers.most_recent_handler import MostRecentHandler
 from api_blaster.server.request_handlers.refresh_handler import RefreshHandler
 from api_blaster.server.request_handlers.test_handler import TestHandler
-from api_blaster.server.request_handlers.test2_handler import Test2Handler
 
 shutdown_event: Union[asyncio.Event, None] = None
 server: Union['tornado.web.Application', None] = None
@@ -46,8 +46,8 @@ async def main(responses_dir: str, port_number: int):
     parse_command_line()
     app = tornado.web.Application(
         [
-            (r"/test", TestHandler),
-            (r"/test2", Test2Handler),
+            (r"/api-blaster-get-test", TestHandler),
+            (r"/api-blaster-post-test", TestHandler),
             (r"/refesh", RefreshHandler),
             (r"/most_recent/.*", MostRecentHandler, dict(responses_dir=responses_dir)),
             (r"/content/.*", ContentHandler, dict(responses_dir=responses_dir)),

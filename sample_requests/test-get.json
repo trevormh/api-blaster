@@ -1,0 +1,5 @@
+{
+    "name": "API Blaster Test - GET",
+    "method": "GET",
+    "url": "{{PROTOCOL}}:{{BASE_URL}}:{{PORT}}/api-blaster-get-test"
+}
