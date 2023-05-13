@@ -14,11 +14,11 @@ class RequestBuilder(AbstractBuilder):
         self.filename = filename
         self.request_config = self.load_json_config(f"{directory}/{filename}")
         self.request = HttpRequest()
-        self._set_env_path()
+        self.load_env()
 
-    def _set_env_path(self):
+    def load_env(self):
         if os.path.isfile(f"{self.path}/.env"):
-            load_dotenv(f"{self.path}/.env")
+            load_dotenv(f"{self.path}/.env", override=True)
             self.env_loaded = True
         else:
             self.env_loaded = False
@@ -35,6 +35,7 @@ class RequestBuilder(AbstractBuilder):
             raise Exception(msg)
 
     def build(self) -> HttpRequest:
+        self.load_env()
         self.set_url()
         self.set_name()
         self.set_headers()

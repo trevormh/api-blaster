@@ -20,8 +20,8 @@ def main():
         response_dir = get_config(ConfigName.RESPONSES_DIR.value)
         port_number = int(get_config(ConfigName.PORT_NUMBER.value))
         if is_port_available(port_number):
-            from .server.main import setup
-            setup(response_dir, port_number)
+            from .server.main import server_setup
+            server_setup(response_dir, port_number)
         else:
             print(f'Server not started, port {port_number} is already in use. Change port number in settings to use server.')
 

@@ -66,32 +66,37 @@ async def main(responses_dir: str, port_number: int):
 
 
 def start_server(responses_dir: str, port_number: int):
+    print(f'Starting server on port {port_number}')
     asyncio.run(main(responses_dir, port_number))
 
 
 server_thread: Union[threading.Thread, None] = None
 
 
-def setup(responses_dir: str, port_number: int):
-    global server_thread
-    server_thread = threading.Thread(target=start_server, args=(responses_dir, port_number), daemon=True)
-    server_thread.start()
+def server_setup(responses_dir: str, port_number: int):
+    try:
+        global server_thread
+        server_thread = threading.Thread(target=start_server, args=(responses_dir, port_number), daemon=True)
+        server_thread.start()
+    except Exception as e:
+        print(e)
 
 
 def stop_server():
-    print('stopping server')
     try:
         server.stop()
         shutdown_event.set()
         asyncio.run(server.close_all_connections())
-        global server_thread
-        server_thread.join()
     except asyncio.exceptions.CancelledError as e:
         pass
+    except Exception as e:
+        pass
+    finally:
+        server_thread.join(timeout=1)
 
 
 def restart_server():
     stop_server()
     response_dir = get_config(ConfigName.RESPONSES_DIR.value)
     port_number = int(get_config(ConfigName.PORT_NUMBER.value))
-    setup(response_dir, port_number)
+    server_setup(response_dir, port_number)
